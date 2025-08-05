@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Bullet
+  - Monster
+  - Boss
+  - EnrmyBullet
+  - BossBullet
+  - Rbullet
+  - Bbullet
+  - Ybullet
+  - HealthItem
+  - Item
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - PlayerBullet
+  - MonsterBullet
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: back
+    uniqueID: 1178905469
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Hitbox
+    uniqueID: 1641372081
+    locked: 0
