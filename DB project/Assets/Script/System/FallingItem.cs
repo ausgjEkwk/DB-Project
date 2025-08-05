@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FallingItem : MonoBehaviour
@@ -14,10 +12,14 @@ public class FallingItem : MonoBehaviour
 
     void Update()
     {
+        // 시간 정지 중이면 움직이지 않음
+        if (TimeStop.IsStopped)
+            return;
+
         // 아래로 이동
         transform.position += Vector3.down * fallSpeed * Time.deltaTime;
 
-        // 화면 아래로 벗어나면 제거
+        // 화면 아래로 벗어나면 삭제
         Vector3 viewPos = mainCamera.WorldToViewportPoint(transform.position);
         if (viewPos.y < 0)
         {
@@ -32,7 +34,7 @@ public class FallingItem : MonoBehaviour
             Health playerHealth = other.GetComponent<Health>();
             if (playerHealth != null)
             {
-                playerHealth.Heal(1);  // 최대체력+1, 현재체력+1 및 UI 자동 반영
+                playerHealth.Heal(1);
             }
             Destroy(gameObject);
         }
