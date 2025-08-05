@@ -186,9 +186,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
+  moveSpeedWithGhost: 1
   flipController: {fileID: 819226112804770353}
   ghostPrefab: {fileID: 2970799732787590221, guid: bffcfc0f87326e840b356c2d5a1e3e76, type: 3}
-  ghostSpawnInterval: 1
+  ghostSpawnInterval: 4
   pattern1Script: {fileID: 7891997326228446342}
 --- !u!114 &819226112804770353
 MonoBehaviour:
