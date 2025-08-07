@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4921929696342388079}
   - component: {fileID: 819226112804770353}
   - component: {fileID: 7891997326228446342}
+  - component: {fileID: 8853531874228033820}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Untagged
@@ -189,8 +190,9 @@ MonoBehaviour:
   moveSpeedWithGhost: 1
   flipController: {fileID: 819226112804770353}
   ghostPrefab: {fileID: 2970799732787590221, guid: bffcfc0f87326e840b356c2d5a1e3e76, type: 3}
-  ghostSpawnInterval: 4
+  ghostSpawnInterval: 0.01
   pattern1Script: {fileID: 7891997326228446342}
+  pattern2Script: {fileID: 8853531874228033820}
 --- !u!114 &819226112804770353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,3 +224,20 @@ MonoBehaviour:
   fireRate: 0.05
   launchInterval: 0.01
   bulletSpeed: 7
+--- !u!114 &8853531874228033820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492342676221988650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c79d6caf042ca28428241125e224ef34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swordPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
+  radius: 1.5
+  swordCount: 8
+  swordSpeed: 10
+  spawnDistanceInterval: 1

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 851922153286555345}
   - component: {fileID: 8215352673419536802}
   - component: {fileID: -3759070874175255086}
+  - component: {fileID: -8953536323991866174}
   m_Layer: 0
   m_Name: Bossbullet
   m_TagString: Untagged
@@ -159,5 +160,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f77b7a167f4fc5f41b2644bf7ebb50cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-8953536323991866174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455275070939650603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05f89929c1398cc41ba711ae12c0b41f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
