@@ -16,7 +16,7 @@ public class TimeStop : MonoBehaviour
 
     public bool IsTimeStopped { get; private set; } = false;
 
-    // 편리하게 외부에서 간단히 확인 가능하도록 프로퍼티 추가
+    // 외부에서 확인 가능
     public static bool IsStopped => Instance != null && Instance.IsTimeStopped;
 
     private void Awake()

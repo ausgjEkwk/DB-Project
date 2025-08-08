@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 819226112804770353}
   - component: {fileID: 7891997326228446342}
   - component: {fileID: 8853531874228033820}
+  - component: {fileID: -8530305315108535449}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Untagged
@@ -193,6 +194,7 @@ MonoBehaviour:
   ghostSpawnInterval: 0.01
   pattern1Script: {fileID: 7891997326228446342}
   pattern2Script: {fileID: 8853531874228033820}
+  pattern3Script: {fileID: -8530305315108535449}
 --- !u!114 &819226112804770353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,3 +243,19 @@ MonoBehaviour:
   swordCount: 8
   swordSpeed: 10
   spawnDistanceInterval: 1
+--- !u!114 &-8530305315108535449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492342676221988650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c5a6f88d1f1d849aea15af6c4931db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gatePrefab: {fileID: 7906833301889499331, guid: 2e3752845e6ece649baabf600e61b0f1, type: 3}
+  verticalSpacing: 2
+  horizontalDistance: 2
+  spawnCount: 9
