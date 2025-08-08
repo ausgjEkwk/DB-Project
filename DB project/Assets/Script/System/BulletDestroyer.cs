@@ -12,8 +12,8 @@ public class BulletDestroyer : MonoBehaviour
 
         if (playAreaParent != null)
         {
-            // 자식 중 이름이 "Area"인 오브젝트 찾고, 그 안에서 Collider2D 얻기
-            Transform areaTransform = playAreaParent.transform.Find("Area");
+            // 자식 중 이름이 "DArea"인 오브젝트 찾고, 그 안에서 Collider2D 얻기
+            Transform areaTransform = playAreaParent.transform.Find("DArea");
             if (areaTransform != null)
             {
                 playAreaBounds = areaTransform.GetComponent<Collider2D>();
@@ -22,7 +22,7 @@ public class BulletDestroyer : MonoBehaviour
 
         if (playAreaBounds == null)
         {
-            Debug.LogError("Area 오브젝트의 Collider2D를 찾을 수 없습니다!");
+            Debug.LogError("DArea 오브젝트의 Collider2D를 찾을 수 없습니다!");
         }
     }
 

@@ -110,6 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3112377610435837866}
   - component: {fileID: 7227596650252844714}
+  - component: {fileID: -3580056330649927389}
   m_Layer: 0
   m_Name: Gate
   m_TagString: Untagged
@@ -148,3 +149,15 @@ MonoBehaviour:
   swordPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
   moveSpeed: 5
   bossPattern: {fileID: -8530305315108535449, guid: 0102e46fef7f1fd49be612428cb6278a, type: 3}
+--- !u!114 &-3580056330649927389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7906833301889499331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f77b7a167f4fc5f41b2644bf7ebb50cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
