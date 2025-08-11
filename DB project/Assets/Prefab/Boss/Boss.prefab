@@ -273,5 +273,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27a81aa71433cea4a93dae5fd9438ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1000
+  maxHealth: 500
   bossHealthUIPrefab: {fileID: 7221219580124784753, guid: ce1c5590d8485024fa3a16ad24876255, type: 3}

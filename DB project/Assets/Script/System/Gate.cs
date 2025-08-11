@@ -7,14 +7,17 @@ public class GateController : MonoBehaviour
     public float moveSpeed = 5f;
 
     private Vector3[] directions = new Vector3[]
-    {
-        Vector3.up,
-        Quaternion.Euler(0,0,60) * Vector3.up,
-        Quaternion.Euler(0,0,120) * Vector3.up,
-        Vector3.down,
-        Quaternion.Euler(0,0,240) * Vector3.up,
-        Quaternion.Euler(0,0,300) * Vector3.up
-    };
+{
+    Quaternion.Euler(0,0,0) * Vector3.up,     // 0도
+    Quaternion.Euler(0,0,45) * Vector3.up,    // 45도
+    Quaternion.Euler(0,0,90) * Vector3.up,    // 90도
+    Quaternion.Euler(0,0,135) * Vector3.up,   // 135도
+    Quaternion.Euler(0,0,180) * Vector3.up,   // 180도
+    Quaternion.Euler(0,0,225) * Vector3.up,   // 225도
+    Quaternion.Euler(0,0,270) * Vector3.up,   // 270도
+    Quaternion.Euler(0,0,315) * Vector3.up    // 315도
+};
+
 
     public BossPattern3 bossPattern; // 칼 리스트 등록용 (옵션)
 

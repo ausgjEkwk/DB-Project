@@ -96,12 +96,14 @@ public class BossPattern3 : MonoBehaviour
 
         Vector3[] directions = new Vector3[]
         {
-            Vector3.up,
-            Quaternion.Euler(0, 0, 60) * Vector3.up,
-            Quaternion.Euler(0, 0, 120) * Vector3.up,
-            Vector3.down,
-            Quaternion.Euler(0, 0, 240) * Vector3.up,
-            Quaternion.Euler(0, 0, 300) * Vector3.up
+            Quaternion.Euler(0,0,0) * Vector3.up,
+            Quaternion.Euler(0,0,45) * Vector3.up,
+            Quaternion.Euler(0,0,90) * Vector3.up,
+            Quaternion.Euler(0,0,135) * Vector3.up,
+            Quaternion.Euler(0,0,180) * Vector3.up,
+            Quaternion.Euler(0,0,225) * Vector3.up,
+            Quaternion.Euler(0,0,270) * Vector3.up,
+            Quaternion.Euler(0,0,315) * Vector3.up
         };
 
         while (elapsed < moveDuration)
