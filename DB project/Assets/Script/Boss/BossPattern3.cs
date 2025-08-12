@@ -15,10 +15,18 @@ public class BossPattern3 : MonoBehaviour
     private List<GateController> spawnedGates = new List<GateController>(); // Gate 리스트
     private float moveSpeed;
 
+    private BossSpecial bossSpecial;
+
     void Start()
     {
         player = GameObject.FindWithTag("Player")?.transform;
         moveSpeed = bulletSpeed;
+
+        bossSpecial = GetComponent<BossSpecial>();
+        if (bossSpecial == null)
+        {
+            Debug.LogWarning("BossSpecial 컴포넌트가 없습니다. 특수패턴 실행 체크 불가.");
+        }
     }
 
     public void RegisterSword(GameObject sword)
@@ -28,6 +36,12 @@ public class BossPattern3 : MonoBehaviour
 
     public IEnumerator ExecutePattern()
     {
+        // BossSpecial 실행 중이면 패턴 실행 안 함
+        if (bossSpecial != null && bossSpecial.IsRunning)
+        {
+            yield break;
+        }
+
         if (player == null)
         {
             Debug.LogWarning("Player 오브젝트를 찾을 수 없습니다.");

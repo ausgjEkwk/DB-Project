@@ -13,6 +13,8 @@ public class BossPattern2 : MonoBehaviour
     private Vector3 lastSpawnPos;
     private Transform playerTransform;
 
+    private BossSpecial bossSpecial;
+
     void Start()
     {
         GameObject player = GameObject.FindWithTag("Player");
@@ -20,6 +22,10 @@ public class BossPattern2 : MonoBehaviour
             playerTransform = player.transform;
         else
             Debug.LogError("BossPattern2: 'Player' 태그 오브젝트를 찾을 수 없습니다.");
+
+        bossSpecial = GetComponent<BossSpecial>();
+        if (bossSpecial == null)
+            Debug.LogWarning("BossSpecial 컴포넌트가 없습니다. 특수패턴 실행 체크 불가.");
     }
 
     public void ResetPattern(Vector3 startPos)
@@ -30,6 +36,10 @@ public class BossPattern2 : MonoBehaviour
 
     public void UpdatePatternDuringMove()
     {
+        // BossSpecial 실행 중이면 이 함수 아무것도 안 함
+        if (bossSpecial != null && bossSpecial.IsRunning)
+            return;
+
         if (playerTransform == null) return;
 
         if (Vector3.Distance(transform.position, lastSpawnPos) >= spawnDistanceInterval)
@@ -54,7 +64,6 @@ public class BossPattern2 : MonoBehaviour
             GameObject sword = Instantiate(swordPrefab, spawnPos, rotation);
             spawnedSwords.Add(sword);
 
-            // SwordMover 컴포넌트에서 방향과 속도 설정
             SwordMover mover = sword.GetComponent<SwordMover>();
             if (mover != null)
             {
@@ -66,6 +75,10 @@ public class BossPattern2 : MonoBehaviour
 
     public void ShootAllSwords()
     {
+        // BossSpecial 실행 중일 경우 절대 발사하지 않음
+        if (bossSpecial != null && bossSpecial.IsRunning)
+            return;
+
         foreach (GameObject sword in spawnedSwords)
         {
             if (sword != null)
@@ -73,7 +86,7 @@ public class BossPattern2 : MonoBehaviour
                 SwordMover mover = sword.GetComponent<SwordMover>();
                 if (mover != null)
                 {
-                    mover.ResumeMovement();  // 이동 재개 (시간 정지 해제 후 칼 날아감)
+                    mover.ResumeMovement();
                 }
             }
         }

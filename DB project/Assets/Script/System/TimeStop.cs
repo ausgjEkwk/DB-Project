@@ -71,6 +71,11 @@ public class TimeStop : MonoBehaviour
             shooter.enabled = false;
         }
 
+        // BossSpecial 칼 이동 일시정지 호출
+        BossSpecial bossSpecial = FindObjectOfType<BossSpecial>();
+        if (bossSpecial != null)
+            bossSpecial.PauseBullets();
+
         // 배경 정지
         BackgroundScroll bg = FindObjectOfType<BackgroundScroll>();
         if (bg != null) bg.enabled = false;
@@ -107,6 +112,11 @@ public class TimeStop : MonoBehaviour
             if (anim != null && i < supportAnimatorSpeeds.Count)
                 anim.speed = supportAnimatorSpeeds[i];
         }
+
+        // BossSpecial 칼 이동 재개 호출
+        BossSpecial bossSpecial = FindObjectOfType<BossSpecial>();
+        if (bossSpecial != null)
+            bossSpecial.ResumeBullets();
 
         // 배경 복구
         BackgroundScroll bg = FindObjectOfType<BackgroundScroll>();

@@ -5,9 +5,13 @@ public class BossHealth : MonoBehaviour
     public int maxHealth = 100;
     private int currentHealth;
 
-    public GameObject bossHealthUIPrefab;  // Inspector에서 UI 프리팹 연결
+    public float HealthPercent => (float)currentHealth / maxHealth;
+
+    public GameObject bossHealthUIPrefab;
 
     private BossHealthUI healthUIInstance;
+
+    private bool specialStarted = false;
 
     void Start()
     {
@@ -16,17 +20,11 @@ public class BossHealth : MonoBehaviour
         if (bossHealthUIPrefab != null)
         {
             GameObject uiObj = Instantiate(bossHealthUIPrefab);
-
-            // 씬의 Canvas 찾아서 UI를 그 하위로 넣기 (안 넣으면 화면에 안 보임)
             GameObject canvas = GameObject.Find("Canvas");
             if (canvas != null)
-            {
                 uiObj.transform.SetParent(canvas.transform, false);
-            }
             else
-            {
                 Debug.LogWarning("씬에 Canvas 오브젝트가 없습니다!");
-            }
 
             healthUIInstance = uiObj.GetComponent<BossHealthUI>();
         }
@@ -41,7 +39,25 @@ public class BossHealth : MonoBehaviour
         if (currentHealth < 0) currentHealth = 0;
 
         if (healthUIInstance != null)
-            healthUIInstance.SetHealthPercent((float)currentHealth / maxHealth);
+            healthUIInstance.SetHealthPercent(HealthPercent);
+
+        if (!specialStarted && HealthPercent < 0.5f)
+        {
+            specialStarted = true;
+
+            BossSpecial bossSpecial = GetComponent<BossSpecial>();
+            if (bossSpecial != null)
+            {
+                bossSpecial.TryStartSpecial(() =>
+                {
+                    specialStarted = false;  // 특수패턴 끝나면 다시 실행 가능
+                });
+            }
+            else
+            {
+                Debug.LogWarning("BossSpecial 컴포넌트가 없습니다.");
+            }
+        }
 
         if (currentHealth <= 0)
             Die();
