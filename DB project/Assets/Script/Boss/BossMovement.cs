@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BossMovement : MonoBehaviour
@@ -20,8 +21,9 @@ public class BossMovement : MonoBehaviour
 
     private bool hasMovedDown = false;
     private float ghostSpawnTimer = 0f;
-
     private bool pattern1Executed = false; // BossSpecial 종료 후 패턴1 실행 여부
+
+    private List<GameObject> patternSwords = new List<GameObject>();
 
     void Awake()
     {
@@ -34,6 +36,39 @@ public class BossMovement : MonoBehaviour
     public void StartMovePattern()
     {
         StartCoroutine(MoveSequence());
+    }
+
+    // 🔹 패턴 칼 등록
+    public void RegisterPatternSword(GameObject sword)
+    {
+        // 사망 중이면 생성 차단
+        BossHealth bossHealth = GetComponent<BossHealth>();
+        if (bossHealth != null && bossHealth.HealthPercent <= 0f)
+        {
+            Destroy(sword);
+            return;
+        }
+
+        // BossSpecial 진행 중이면 생성 차단
+        if (bossSpecialScript != null && bossSpecialScript.IsRunning)
+        {
+            Destroy(sword);
+            return;
+        }
+
+        if (!patternSwords.Contains(sword))
+            patternSwords.Add(sword);
+    }
+
+    // 🔹 기존 패턴 칼 제거
+    public void ClearPatternSwords()
+    {
+        foreach (var sword in patternSwords)
+        {
+            if (sword != null)
+                Destroy(sword);
+        }
+        patternSwords.Clear();
     }
 
     IEnumerator MoveSequence()
@@ -50,21 +85,27 @@ public class BossMovement : MonoBehaviour
         {
             animator.Play("Boss_Idle");
 
-            // BossSpecial 진행 중이면 완전히 대기
+            // 🔹 BossSpecial 진행 중이면 모든 패턴 칼 제거 후 대기
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            {
+                ClearPatternSwords();
                 yield return null;
+            }
 
-            // BossSpecial 종료 후 패턴1이 아직 실행되지 않았다면
+            // BossSpecial 종료 후 패턴1부터 다시 시작
+            pattern1Executed = false;
+
+            // 1️⃣ 패턴1
             if (!pattern1Executed)
             {
-                // 보스가 0 위치가 아니라면 이동
                 while (!Mathf.Approximately(transform.position.x, 0f))
                     yield return StartCoroutine(MoveTo(new Vector3(0f, transform.position.y, 0f), moveSpeed));
 
-                if (pattern1Script != null)
+                // BossSpecial 진행 중이면 실행 차단
+                if (pattern1Script != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
                     yield return StartCoroutine(pattern1Script.StartPattern());
 
-                pattern1Executed = true; // 패턴1 실행 완료
+                pattern1Executed = true;
                 yield return new WaitForSeconds(1f);
             }
 
@@ -114,17 +155,15 @@ public class BossMovement : MonoBehaviour
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
-            if (pattern3Script != null && TimeStop.Instance != null)
+            if (pattern3Script != null && TimeStop.Instance != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
             {
                 TimeStop.Instance.StartTimeStop();
                 yield return StartCoroutine(pattern3Script.ExecutePattern());
                 TimeStop.Instance.EndTimeStop();
             }
 
-            // 한 루프 종료 후, 패턴1 플래그 초기화하여 다음 BossSpecial 발생 후 다시 패턴1부터 시작 가능
             pattern1Executed = false;
-
-            yield return null; // 루프 반복
+            yield return null;
         }
     }
 
@@ -187,14 +226,13 @@ public class BossMovement : MonoBehaviour
         }
     }
 
-    // 외부에서 BossSpecial 시작
     public void StartBossSpecial()
     {
         if (bossSpecialScript != null)
         {
             bossSpecialScript.TryStartSpecial(() =>
             {
-                // 종료 콜백: 필요 시 추가 동작
+                // 필요 시 종료 콜백
             });
         }
     }

@@ -1,3 +1,5 @@
+ï»¿// BossHealth.cs
+using System.Collections;
 using UnityEngine;
 
 public class BossHealth : MonoBehaviour
@@ -13,9 +15,20 @@ public class BossHealth : MonoBehaviour
 
     private bool specialStarted = false;
 
+    private BossMovement bossMovement; // BossMovement ì°¸ì¡°
+
+    [Header("Death Movement Settings")]
+    public float xMoveDuration = 1f;    // Xì¶• ì´ë™ ì‹œê°„
+    public float yRiseDuration = 1f;    // Yì¶• ìƒìŠ¹ ì‹œê°„
+    public float yRiseAmount = 3f;      // ìƒìŠ¹ ê±°ë¦¬
+
+    private bool isDead = false;
+
     void Start()
     {
         currentHealth = maxHealth;
+
+        bossMovement = GetComponent<BossMovement>();
 
         if (bossHealthUIPrefab != null)
         {
@@ -24,7 +37,7 @@ public class BossHealth : MonoBehaviour
             if (canvas != null)
                 uiObj.transform.SetParent(canvas.transform, false);
             else
-                Debug.LogWarning("¾À¿¡ Canvas ¿ÀºêÁ§Æ®°¡ ¾ø½À´Ï´Ù!");
+                Debug.LogWarning("ì”¬ì— Canvas ì˜¤ë¸Œì íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤!");
 
             healthUIInstance = uiObj.GetComponent<BossHealthUI>();
         }
@@ -35,12 +48,15 @@ public class BossHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
+
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
 
         if (healthUIInstance != null)
             healthUIInstance.SetHealthPercent(HealthPercent);
 
+        // íŠ¹ìˆ˜íŒ¨í„´ ìë™ ì‹œì‘
         if (!specialStarted && HealthPercent < 0.5f)
         {
             specialStarted = true;
@@ -50,22 +66,59 @@ public class BossHealth : MonoBehaviour
             {
                 bossSpecial.TryStartSpecial(() =>
                 {
-                    specialStarted = false;  // Æ¯¼öÆĞÅÏ ³¡³ª¸é ´Ù½Ã ½ÇÇà °¡´É
+                    specialStarted = false;
                 });
-            }
-            else
-            {
-                Debug.LogWarning("BossSpecial ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù.");
             }
         }
 
+        // ì²´ë ¥ 0ì´ë©´ ì‚¬ë§ ì²˜ë¦¬
         if (currentHealth <= 0)
-            Die();
+        {
+            isDead = true;
+
+            if (bossMovement != null)
+            {
+                bossMovement.StopAllCoroutines(); // ê³µê²© ë£¨í”„ ì¢…ë£Œ
+                bossMovement.ClearPatternSwords(); // ëª¨ë“  íŒ¨í„´ ì¹¼ ì œê±°
+            }
+
+            StartCoroutine(DeathSequence());
+        }
+    }
+
+    IEnumerator DeathSequence()
+    {
+        // 1ï¸âƒ£ Xì¶• 0ìœ¼ë¡œ ì´ë™
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = new Vector3(0f, startPos.y, startPos.z);
+        float elapsed = 0f;
+
+        while (elapsed < xMoveDuration)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, elapsed / xMoveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPos;
+
+        // 2ï¸âƒ£ Yì¶• ìƒìŠ¹
+        startPos = transform.position;
+        targetPos = startPos + Vector3.up * yRiseAmount;
+        elapsed = 0f;
+
+        while (elapsed < yRiseDuration)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, elapsed / yRiseDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Die();
     }
 
     void Die()
     {
-        Debug.Log("º¸½º°¡ »ç¸ÁÇß½À´Ï´Ù!");
+        Debug.Log("ë³´ìŠ¤ê°€ ì‚¬ë§í–ˆìŠµë‹ˆë‹¤!");
         Destroy(gameObject);
 
         if (healthUIInstance != null)

@@ -1,5 +1,4 @@
-﻿// BossPattern1.cs
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,16 +15,19 @@ public class BossPattern1 : MonoBehaviour
     public float bulletSpeed = 7f;
 
     private List<GameObject> spawnedBullets = new List<GameObject>();
-
     private BossSpecial bossSpecial;
+    private BossMovement bossMovement;
 
     void Start()
     {
         bossSpecial = GetComponent<BossSpecial>();
+        bossMovement = GetComponent<BossMovement>();
+
         if (bossSpecial == null)
-        {
             Debug.LogWarning("BossSpecial 컴포넌트가 없습니다. 특수패턴 실행 체크 불가.");
-        }
+
+        if (bossMovement == null)
+            Debug.LogWarning("BossMovement 컴포넌트가 없습니다. 칼 등록 불가.");
     }
 
     public IEnumerator StartPattern()
@@ -46,6 +48,14 @@ public class BossPattern1 : MonoBehaviour
 
         while (elapsed < duration)
         {
+            // BossSpecial 진행 중이면 생성 중단
+            if (bossSpecial != null && bossSpecial.IsRunning)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+                continue;
+            }
+
             foreach (GameObject bullet in spawnedBullets)
             {
                 if (bullet != null)
@@ -61,10 +71,14 @@ public class BossPattern1 : MonoBehaviour
                 {
                     float currentAngle = angle + i * 90f;
                     Vector2 dir = new Vector2(Mathf.Cos(currentAngle * Mathf.Deg2Rad), Mathf.Sin(currentAngle * Mathf.Deg2Rad)).normalized;
-
                     Vector2 spawnPos = (Vector2)transform.position;
 
                     GameObject bullet = Instantiate(bossBulletPrefab, spawnPos, Quaternion.identity);
+
+                    // 🔹 BossMovement에 등록 (BossSpecial 진행 중이면 Destroy 처리)
+                    if (bossMovement != null)
+                        bossMovement.RegisterPatternSword(bullet);
+
                     Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
                     if (rb != null)
                         rb.velocity = Vector2.zero;
@@ -72,7 +86,6 @@ public class BossPattern1 : MonoBehaviour
                     bullet.transform.up = dir;
 
                     spawnedBullets.Add(bullet);
-
                     bulletPositions.Add((Vector2)transform.position + dir * bulletDistance);
                     bulletDirections.Add(dir);
                 }
@@ -115,9 +128,7 @@ public class BossPattern1 : MonoBehaviour
 
                 Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
                 if (rb != null)
-                {
                     rb.velocity = bulletDirections[i] * bulletSpeed;
-                }
             }
             yield return new WaitForSeconds(launchInterval);
         }
