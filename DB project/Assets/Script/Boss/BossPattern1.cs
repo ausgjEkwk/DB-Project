@@ -30,11 +30,6 @@ public class BossPattern1 : MonoBehaviour
 
     public IEnumerator StartPattern()
     {
-        if (bossSpecial != null && bossSpecial.IsRunning)
-        {
-            yield break;
-        }
-
         yield return StartCoroutine(FirePattern());
     }
 

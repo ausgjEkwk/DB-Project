@@ -36,12 +36,7 @@ public class BossPattern3 : MonoBehaviour
 
     public IEnumerator ExecutePattern()
     {
-        // BossSpecial 실행 중이면 패턴 실행 안 함
-        if (bossSpecial != null && bossSpecial.IsRunning)
-        {
-            yield break;
-        }
-
+       
         if (player == null)
         {
             Debug.LogWarning("Player 오브젝트를 찾을 수 없습니다.");

@@ -75,10 +75,7 @@ public class BossPattern2 : MonoBehaviour
 
     public void ShootAllSwords()
     {
-        // BossSpecial 실행 중일 경우 절대 발사하지 않음
-        if (bossSpecial != null && bossSpecial.IsRunning)
-            return;
-
+    
         foreach (GameObject sword in spawnedSwords)
         {
             if (sword != null)

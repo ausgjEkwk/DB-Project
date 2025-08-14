@@ -1,5 +1,4 @@
-// BossSpecial.cs
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,24 +6,24 @@ using UnityEngine;
 public class BossSpecial : MonoBehaviour
 {
     [Header("Settings")]
-    public GameObject swordPrefab;       // Æ¯¼öÆĞÅÏ¿¡¼­ ¹ß»çÇÒ °Ë ÇÁ¸®ÆÕ
-    public float moveSpeed = 2f;         // º¸½º ÀÌµ¿ ¼Óµµ (½Ã°£Á¤Áö »óÅÂ¿Í ¹«°üÇÑ ÀÌµ¿ ¼Óµµ)
-    public float stepDistance = 0.5f;    // ÀÌµ¿ ½Ã ÇÑ¹ø¿¡ ¿òÁ÷ÀÌ´Â °Å¸®
-    public float leftX = -2.5f;          // Æ¯¼öÆĞÅÏ ÁÂÃø ³¡ XÁÂÇ¥
-    public float rightX = 2.5f;          // Æ¯¼öÆĞÅÏ ¿ìÃø ³¡ XÁÂÇ¥
+    public GameObject swordPrefab;       // íŠ¹ìˆ˜íŒ¨í„´ì—ì„œ ë°œì‚¬í•  ê²€ í”„ë¦¬íŒ¹
+    public float moveSpeed = 2f;         // ë³´ìŠ¤ ì´ë™ ì†ë„ (ì‹œê°„ì •ì§€ ìƒíƒœì™€ ë¬´ê´€í•œ ì´ë™ ì†ë„)
+    public float stepDistance = 0.5f;    // ì´ë™ ì‹œ í•œë²ˆì— ì›€ì§ì´ëŠ” ê±°ë¦¬
+    public float leftX = -2.5f;          // íŠ¹ìˆ˜íŒ¨í„´ ì¢Œì¸¡ ë Xì¢Œí‘œ
+    public float rightX = 2.5f;          // íŠ¹ìˆ˜íŒ¨í„´ ìš°ì¸¡ ë Xì¢Œí‘œ
 
-    private bool isRunning = false;      // Æ¯¼öÆĞÅÏ ½ÇÇàÁßÀÎÁö ¿©ºÎ
-    private bool isFinished = false;     // Æ¯¼öÆĞÅÏ ¿Ï·á ¿©ºÎ
+    private bool isRunning = false;      // íŠ¹ìˆ˜íŒ¨í„´ ì‹¤í–‰ì¤‘ì¸ì§€ ì—¬ë¶€
+    private bool isFinished = false;     // íŠ¹ìˆ˜íŒ¨í„´ ì™„ë£Œ ì—¬ë¶€
 
     public bool IsRunning => isRunning;
     public bool IsFinished => isFinished;
 
-    private bool isPaused = false;       // ÅºÈ¯ ÀÌµ¿ ÀÏ½ÃÁ¤Áö »óÅÂ (½Ã°£Á¤Áö¿ë)
+    private bool isPaused = false;       // íƒ„í™˜ ì´ë™ ì¼ì‹œì •ì§€ ìƒíƒœ (ì‹œê°„ì •ì§€ìš©)
     private List<GameObject> activeSwords = new List<GameObject>();
 
     public bool DisableOtherPatterns => isRunning;
 
-    // Æ¯¼öÆĞÅÏ ½ÃÀÛ ½Ãµµ (Äİ¹éÀ¸·Î ¿Ï·á ¾Ë¸²)
+    // íŠ¹ìˆ˜íŒ¨í„´ ì‹œì‘ ì‹œë„ (ì½œë°±ìœ¼ë¡œ ì™„ë£Œ ì•Œë¦¼)
     public void TryStartSpecial(Action onComplete)
     {
         if (isRunning || isFinished) return;
