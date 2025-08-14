@@ -32,13 +32,25 @@ public class Health : MonoBehaviour
 
         if (isPlayer)
         {
+            // UI 업데이트
             HealthUIManager.Instance?.UpdateHearts(currentHealth);
 
             if (currentHealth <= 0)
             {
                 Debug.Log("플레이어 사망");
+
+                // 1) 스프라이트 회색 처리 (자식 포함 전부 회색으로)
+                SpriteRenderer[] srs = GetComponentsInChildren<SpriteRenderer>();
+                foreach (var sr in srs) sr.color = Color.gray;
+
+                // 2) 게임 정지
+                Time.timeScale = 0f;
+
+                // 3) Game Over UI 표시
+                FindObjectOfType<GameOverUIManager>()?.ShowGameOverUI();
+
+                // 4) 이벤트 호출(필요시)
                 OnDeath?.Invoke();
-                // 추가 게임오버 처리 여기에 넣기
             }
         }
         else

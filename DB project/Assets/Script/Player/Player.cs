@@ -115,19 +115,7 @@ public class PlayerController : MonoBehaviour
         activeSupports.Add(support);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Ybullet") || collision.CompareTag("Rbullet") || collision.CompareTag("Bbullet"))
-        {
-            if (health != null)
-            {
-                health.TakeDamage(1);
-            }
-
-            Destroy(collision.gameObject); // 총알 제거
-        }
-    }
-
+    
     // ▼ 아이템 흡수 기능
     private void AttractNearbyItems()
     {

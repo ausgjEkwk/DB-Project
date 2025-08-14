@@ -57,6 +57,7 @@ public class Boom : MonoBehaviour
         RemoveBulletsByTag("Rbullet");
         RemoveBulletsByTag("Bbullet");
         RemoveBulletsByTag("Ybullet");
+        RemoveBulletsByTag("BossBullet");
     }
 
     void RemoveBulletsByTag(string tag)

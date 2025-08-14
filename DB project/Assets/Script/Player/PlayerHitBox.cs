@@ -15,7 +15,7 @@ public class PlayerHitBox : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // 몬스터 탄환과 충돌 시
-        if (collision.CompareTag("Bbullet") || collision.CompareTag("Rbullet") || collision.CompareTag("Ybullet"))
+        if (collision.CompareTag("Bbullet") || collision.CompareTag("Rbullet") || collision.CompareTag("Ybullet") || collision.CompareTag("BossBullet"))
         {
             if (playerHealth != null)
             {
