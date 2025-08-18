@@ -1,3 +1,4 @@
+// GameOverUIManager.cs
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +11,7 @@ public class GameOverUIManager : MonoBehaviour
     [Header("Selector Fixed Positions")]
     public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu 왼쪽
     public Vector2 retryPos = new Vector2(300f, -316f);    // Retry 왼쪽
+    public bool IsShown => isShown;  // 외부에서 읽기만 가능
 
     private int currentIndex = 0; // 0 = MainMenu, 1 = Retry
     private bool isShown = false;
@@ -57,7 +59,6 @@ public class GameOverUIManager : MonoBehaviour
     {
         if (selector == null) return;
 
-        // X는 고정, Y만 이동
         Vector2 pos = currentIndex == 0 ? mainMenuPos : retryPos;
         selector.anchoredPosition = pos;
     }
@@ -72,6 +73,10 @@ public class GameOverUIManager : MonoBehaviour
                 SceneManager.LoadScene("MainMenuScene");
                 break;
             case 1: // Retry
+                // Retry 시 HealthUIManager가 하트 생성하지 않도록 플래그 설정
+                if (HealthUIManager.Instance != null)
+                    HealthUIManager.Instance.SetPreventAutoInitialize(true);
+
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }

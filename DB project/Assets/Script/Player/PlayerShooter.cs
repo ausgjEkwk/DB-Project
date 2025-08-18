@@ -52,6 +52,9 @@ public class PlayerShooter : MonoBehaviour
         // 폭탄 사용 (X키)
         if (Input.GetKeyDown(KeyCode.X))
         {
+            if (FindObjectOfType<GameOverUIManager>()?.IsShown == true)
+                return; // 게임오버 시 입력 무시
+
             if (boomPrefab != null && boomCount > 0)
             {
                 Instantiate(boomPrefab, boomSpawnPosition, Quaternion.identity);
