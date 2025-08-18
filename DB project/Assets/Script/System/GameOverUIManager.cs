@@ -1,18 +1,17 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class GameOverUIManager : MonoBehaviour
 {
     [Header("References")]
     public GameObject gameOverPanel;      // GameOverPanel
-    public RectTransform selector;        // 화살표 이미지 RectTransform
-    public RectTransform[] menuOptions;   // MainMenuText, RetryText (이 순서로 드래그)
+    public RectTransform selector;        // 화살표 이미지
 
-    [Header("Selector Offset (px)")]
-    public float selectorXOffset = -80f;  // 텍스트 왼쪽에 화살표 두고 싶으면 음수
+    [Header("Selector Fixed Positions")]
+    public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu 왼쪽
+    public Vector2 retryPos = new Vector2(300f, -316f);    // Retry 왼쪽
 
-    private int currentIndex = 0;
+    private int currentIndex = 0; // 0 = MainMenu, 1 = Retry
     private bool isShown = false;
 
     private void Start()
@@ -25,19 +24,19 @@ public class GameOverUIManager : MonoBehaviour
     {
         if (!isShown) return;
 
-        // ↑/↓/W/S 입력
+        // 위/아래 키 입력
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
-            currentIndex = (currentIndex - 1 + menuOptions.Length) % menuOptions.Length;
+            currentIndex = (currentIndex - 1 + 2) % 2;
             UpdateSelectorPosition();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            currentIndex = (currentIndex + 1) % menuOptions.Length;
+            currentIndex = (currentIndex + 1) % 2;
             UpdateSelectorPosition();
         }
 
-        // 엔터/스페이스 선택
+        // 선택
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             ActivateCurrent();
@@ -47,7 +46,6 @@ public class GameOverUIManager : MonoBehaviour
     public void ShowGameOverUI()
     {
         isShown = true;
-
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
@@ -57,30 +55,23 @@ public class GameOverUIManager : MonoBehaviour
 
     private void UpdateSelectorPosition()
     {
-        if (selector == null || menuOptions == null || menuOptions.Length == 0) return;
+        if (selector == null) return;
 
-        // selector와 menuOptions가 같은 부모(MenuItems) 아래에 있다고 가정
-        RectTransform target = menuOptions[currentIndex];
-
-        // 대상의 Y에 맞추고 X는 오프셋 적용
-        Vector2 newAnchored = new Vector2(selectorXOffset, target.anchoredPosition.y);
-        selector.anchoredPosition = newAnchored;
+        // X는 고정, Y만 이동
+        Vector2 pos = currentIndex == 0 ? mainMenuPos : retryPos;
+        selector.anchoredPosition = pos;
     }
 
     private void ActivateCurrent()
     {
-        // Time.timeScale = 0 상태이므로, 씬 변경 전에 반드시 1로 복구
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; // 씬 이동 전에 시간 복구
 
         switch (currentIndex)
         {
-            case 0:
-                // Main Menu
-                SceneManager.LoadScene("MainMenuScene"); // ← 실제 메인메뉴 씬 이름으로 변경
+            case 0: // Main Menu
+                SceneManager.LoadScene("MainMenuScene");
                 break;
-
-            case 1:
-                // Retry (현재 씬 재시작)
+            case 1: // Retry
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }
