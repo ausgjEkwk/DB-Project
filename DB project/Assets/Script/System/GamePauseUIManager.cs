@@ -99,13 +99,17 @@ public class GamePauseUIManager : MonoBehaviour
                 HidePauseUI(); // 일시정지 해제
                 break;
             case 1: // Retry
+                if (TimeStop.Instance != null)
+                    Destroy(TimeStop.Instance.gameObject); // ★ TimeStop 제거
+
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
+
             case 2: // MainMenu
-                SceneManager.LoadScene("MainMenuScene");
+                SceneManager.LoadScene("Menu");
                 break;
         }
     }

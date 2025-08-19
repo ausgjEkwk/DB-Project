@@ -228,7 +228,7 @@ MonoBehaviour:
   totalRotations: 3
   fireRate: 0.05
   launchInterval: 0.01
-  bulletSpeed: 7
+  bulletSpeed: 8
 --- !u!114 &8853531874228033820
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -70,15 +70,18 @@ public class GameOverUIManager : MonoBehaviour
         switch (currentIndex)
         {
             case 0: // Main Menu
-                SceneManager.LoadScene("MainMenuScene");
+                SceneManager.LoadScene("Menu");
                 break;
             case 1: // Retry
-                // Retry 시 HealthUIManager가 하트 생성하지 않도록 플래그 설정
+                if (TimeStop.Instance != null)
+                    Destroy(TimeStop.Instance.gameObject); // ★ TimeStop 제거
+
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
+
         }
     }
 }

@@ -44,7 +44,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -3675287157520745797, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: bulletSpeed
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1352894493682623432, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_LocalPosition.x
@@ -86,6 +86,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2315013259543532459, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
+      propertyPath: moveSpeed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_Name
       value: MonsterB
@@ -124,10 +128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityType: 1
   maxHealth: 5
   currentHealth: 0
-  playerMaxHealthLimit: 10
+  isPlayer: 0
 --- !u!1001 &6131221327179439093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -223,10 +226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityType: 1
   maxHealth: 5
   currentHealth: 0
-  playerMaxHealthLimit: 10
+  isPlayer: 0
 --- !u!1001 &7485639811913506581
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -309,10 +311,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityType: 1
   maxHealth: 5
   currentHealth: 0
-  playerMaxHealthLimit: 10
+  isPlayer: 0
 --- !u!4 &8440915446020488413 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1352894493682623432, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}

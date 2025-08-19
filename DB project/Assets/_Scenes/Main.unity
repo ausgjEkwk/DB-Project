@@ -603,10 +603,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1253546762}
   - {fileID: 221478118}
   - {fileID: 1335562464}
   - {fileID: 4492085}
-  - {fileID: 1253546762}
   - {fileID: 1335151329}
   - {fileID: 1866071548}
   - {fileID: 602802205}
@@ -2137,7 +2137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heartPrefab: {fileID: 5984311033959887826, guid: 6801b343998e9d64aba180ae59b5d506, type: 3}
-  heartContainer: {fileID: 1843454202}
+  heartContainerName: HeartContainer
 --- !u!1 &1330846483
 GameObject:
   m_ObjectHideFlags: 0
