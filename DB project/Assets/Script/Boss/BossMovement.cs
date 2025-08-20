@@ -38,7 +38,7 @@ public class BossMovement : MonoBehaviour
         StartCoroutine(MoveSequence());
     }
 
-    // 🔹 패턴 칼 등록
+    // 패턴 칼 등록
     public void RegisterPatternSword(GameObject sword)
     {
         // 사망 중이면 생성 차단
@@ -60,7 +60,7 @@ public class BossMovement : MonoBehaviour
             patternSwords.Add(sword);
     }
 
-    // 🔹 기존 패턴 칼 제거
+    // 기존 패턴 칼 제거
     public void ClearPatternSwords()
     {
         foreach (var sword in patternSwords)
@@ -85,7 +85,7 @@ public class BossMovement : MonoBehaviour
         {
             animator.Play("Boss_Idle");
 
-            // 🔹 BossSpecial 진행 중이면 모든 패턴 칼 제거 후 대기
+            // BossSpecial 진행 중이면 모든 패턴 칼 제거 후 대기
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
             {
                 ClearPatternSwords();
@@ -95,7 +95,7 @@ public class BossMovement : MonoBehaviour
             // BossSpecial 종료 후 패턴1부터 다시 시작
             pattern1Executed = false;
 
-            // 1️⃣ 패턴1
+            // 1️ 패턴1
             if (!pattern1Executed)
             {
                 while (!Mathf.Approximately(transform.position.x, 0f))
@@ -109,7 +109,7 @@ public class BossMovement : MonoBehaviour
                 yield return new WaitForSeconds(1f);
             }
 
-            // 2️⃣ 왼쪽 이동
+            // 2️ 왼쪽 이동
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
@@ -118,7 +118,7 @@ public class BossMovement : MonoBehaviour
             yield return StartCoroutine(MoveTo(new Vector3(-2.5f, transform.position.y, 0f), moveSpeed));
             yield return new WaitForSeconds(1f);
 
-            // 3️⃣ 오른쪽 이동 + 잔상 + 패턴2
+            // 3️ 오른쪽 이동 + 잔상 + 패턴2
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
@@ -142,7 +142,7 @@ public class BossMovement : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
 
-            // 4️⃣ 가운데 복귀
+            // 4️ 가운데 복귀
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
@@ -151,7 +151,7 @@ public class BossMovement : MonoBehaviour
             yield return StartCoroutine(MoveTo(new Vector3(0f, transform.position.y, 0f), moveSpeed));
             animator.Play("Boss_Idle");
 
-            // 5️⃣ 패턴3 실행
+            // 5️ 패턴3 실행
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 

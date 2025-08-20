@@ -70,8 +70,18 @@ public class EnemySpawner : MonoBehaviour
             waveCount++;
         }
 
+        // 웨이브 끝났으니 NormalBGM 페이드 아웃
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.StopBGMWithFade();
+
+
         // 5웨이브 끝나면 보스 소환 조건 체크 시작
         StartCoroutine(CheckAndSpawnBoss());
+
+        //  보스 BGM 페이드 인 시작
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBossBGM();
+
     }
 
     IEnumerator CheckAndSpawnBoss()
@@ -106,6 +116,11 @@ public class EnemySpawner : MonoBehaviour
         else
         {
             Debug.LogError("보스 프리팹에 BossMovement 컴포넌트 없음");
+        }
+        // 여기서 BGM 전환 호출
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.BossAppeared();
         }
     }
 

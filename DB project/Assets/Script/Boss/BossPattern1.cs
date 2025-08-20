@@ -75,7 +75,7 @@ public class BossPattern1 : MonoBehaviour
 
                     GameObject bullet = Instantiate(bossBulletPrefab, spawnPos, Quaternion.identity);
 
-                    // 🔹 BossMovement에 등록 (BossSpecial 진행 중이면 Destroy 처리)
+                    // BossMovement에 등록 (BossSpecial 진행 중이면 Destroy 처리)
                     if (bossMovement != null)
                         bossMovement.RegisterPatternSword(bullet);
 

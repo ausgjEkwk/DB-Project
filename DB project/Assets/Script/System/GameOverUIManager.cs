@@ -1,4 +1,4 @@
-// GameOverUIManager.cs
+ï»¿// GameOverUIManager.cs
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,12 +6,12 @@ public class GameOverUIManager : MonoBehaviour
 {
     [Header("References")]
     public GameObject gameOverPanel;      // GameOverPanel
-    public RectTransform selector;        // È­»ìÇ¥ ÀÌ¹ÌÁö
+    public RectTransform selector;        // í™”ì‚´í‘œ ì´ë¯¸ì§€
 
     [Header("Selector Fixed Positions")]
-    public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu ¿ŞÂÊ
-    public Vector2 retryPos = new Vector2(300f, -316f);    // Retry ¿ŞÂÊ
-    public bool IsShown => isShown;  // ¿ÜºÎ¿¡¼­ ÀĞ±â¸¸ °¡´É
+    public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu ì™¼ìª½
+    public Vector2 retryPos = new Vector2(300f, -316f);    // Retry ì™¼ìª½
+    public bool IsShown => isShown;  // ì™¸ë¶€ì—ì„œ ì½ê¸°ë§Œ ê°€ëŠ¥
 
     private int currentIndex = 0; // 0 = MainMenu, 1 = Retry
     private bool isShown = false;
@@ -26,7 +26,7 @@ public class GameOverUIManager : MonoBehaviour
     {
         if (!isShown) return;
 
-        // À§/¾Æ·¡ Å° ÀÔ·Â
+        // ìœ„/ì•„ë˜ í‚¤ ì…ë ¥
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             currentIndex = (currentIndex - 1 + 2) % 2;
@@ -38,7 +38,7 @@ public class GameOverUIManager : MonoBehaviour
             UpdateSelectorPosition();
         }
 
-        // ¼±ÅÃ
+        // ì„ íƒ
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             ActivateCurrent();
@@ -53,7 +53,12 @@ public class GameOverUIManager : MonoBehaviour
 
         currentIndex = 0;
         UpdateSelectorPosition();
+
+        // ğŸ”¹ ì—¬ê¸°ì„œ ì‚¬ë§ BGM ì‹¤í–‰
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayerDied();
     }
+
 
     private void UpdateSelectorPosition()
     {
@@ -65,7 +70,7 @@ public class GameOverUIManager : MonoBehaviour
 
     private void ActivateCurrent()
     {
-        Time.timeScale = 1f; // ¾À ÀÌµ¿ Àü¿¡ ½Ã°£ º¹±¸
+        Time.timeScale = 1f; // ì”¬ ì´ë™ ì „ì— ì‹œê°„ ë³µêµ¬
 
         switch (currentIndex)
         {
@@ -74,10 +79,14 @@ public class GameOverUIManager : MonoBehaviour
                 break;
             case 1: // Retry
                 if (TimeStop.Instance != null)
-                    Destroy(TimeStop.Instance.gameObject); // ¡Ú TimeStop Á¦°Å
+                    Destroy(TimeStop.Instance.gameObject);
 
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
+
+                // ğŸ”¹ Retry ì‹œ BGM ë¦¬ì…‹
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.RetryReset();
 
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;

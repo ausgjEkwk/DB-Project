@@ -1149,8 +1149,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normalBGM: {fileID: 8300000, guid: cc26a9cd4c7b4524cacc4c9cbdcc4443, type: 3}
+  normalVolume: 0.15
   bossBGM: {fileID: 8300000, guid: eb731a30d7122c7478be47f18f9e407c, type: 3}
+  bossVolume: 0.15
   playerDeathBGM: {fileID: 8300000, guid: cdf2357ab7c686a4789ee428b99aa93e, type: 3}
+  playerDeathVolume: 0.2
+  fadeDuration: 1
 --- !u!82 &519420035
 AudioSource:
   m_ObjectHideFlags: 0

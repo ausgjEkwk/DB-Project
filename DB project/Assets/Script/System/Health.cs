@@ -39,7 +39,7 @@ public class Health : MonoBehaviour
             {
                 Debug.Log("플레이어 사망");
 
-                // 1) 스프라이트 회색 처리 (자식 포함 전부 회색으로)
+                // 1) 스프라이트 회색 처리
                 SpriteRenderer[] srs = GetComponentsInChildren<SpriteRenderer>();
                 foreach (var sr in srs) sr.color = Color.gray;
 
@@ -49,9 +49,14 @@ public class Health : MonoBehaviour
                 // 3) Game Over UI 표시
                 FindObjectOfType<GameOverUIManager>()?.ShowGameOverUI();
 
-                // 4) 이벤트 호출(필요시)
+                // 4) 사망 BGM 재생
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayerDied();
+
+                // 5) 이벤트 호출
                 OnDeath?.Invoke();
             }
+
         }
         else
         {

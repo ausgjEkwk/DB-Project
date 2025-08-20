@@ -88,7 +88,13 @@ public class BossHealth : MonoBehaviour
 
     IEnumerator DeathSequence()
     {
-        // 1️⃣ X축 0으로 이동
+        // 보스 BGM 페이드 아웃
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopBGMWithFade();
+        }
+
+        // 1️ X축 0으로 이동
         Vector3 startPos = transform.position;
         Vector3 targetPos = new Vector3(0f, startPos.y, startPos.z);
         float elapsed = 0f;
@@ -101,7 +107,7 @@ public class BossHealth : MonoBehaviour
         }
         transform.position = targetPos;
 
-        // 2️⃣ Y축 상승
+        // 2️ Y축 상승 (올라가는 동안 Bossbullet 제거)
         startPos = transform.position;
         targetPos = startPos + Vector3.up * yRiseAmount;
         elapsed = 0f;
@@ -110,11 +116,20 @@ public class BossHealth : MonoBehaviour
         {
             transform.position = Vector3.Lerp(startPos, targetPos, elapsed / yRiseDuration);
             elapsed += Time.deltaTime;
+
+            // 화면에 남아있는 Bossbullet 제거
+            GameObject[] bossBullets = GameObject.FindGameObjectsWithTag("BossBullet");
+            foreach (GameObject bullet in bossBullets)
+            {
+                Destroy(bullet);
+            }
+
             yield return null;
         }
 
         Die();
     }
+
 
     void Die()
     {

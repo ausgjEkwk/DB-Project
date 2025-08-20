@@ -17,8 +17,8 @@ public class MenuManager : MonoBehaviour
     // Start / Options 좌표값 미리 지정
     private Vector2[] selectorPositions = new Vector2[]
     {
-        new Vector2(-270f, -145f), // Start
-        new Vector2(60f, -145f)    // Options
+        new Vector2(-220f, -144f), // Start
+        new Vector2(63f, -144f)    // Options
     };
 
     void Start()
