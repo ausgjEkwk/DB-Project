@@ -4,7 +4,6 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject bossPrefab;            // 보스 프리팹
-
     public GameObject[] monsterPrefabs;      // 몬스터 그룹 프리팹 배열 (A, B, C)
     public float spawnInterval = 2f;         // 몬스터 생성 간격 (초)
 
@@ -16,9 +15,6 @@ public class EnemySpawner : MonoBehaviour
     public float itemFallSpeed = 2f;
 
     private float itemSpawnTimer = 0f;
-
-    
-
     private int waveCount = 0;
     private bool bossSpawned = false;
 
@@ -70,26 +66,22 @@ public class EnemySpawner : MonoBehaviour
             waveCount++;
         }
 
-        // 웨이브 끝났으니 NormalBGM 페이드 아웃
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.StopBGMWithFade();
-
-
-        // 5웨이브 끝나면 보스 소환 조건 체크 시작
-        StartCoroutine(CheckAndSpawnBoss());
-
-        //  보스 BGM 페이드 인 시작
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlayBossBGM();
-
+        // 웨이브 끝났으니 몬스터 제거 후 NormalBGM 페이드 아웃 시작
+        StartCoroutine(WaitForAllMonstersAndFadeBGM());
     }
 
-    IEnumerator CheckAndSpawnBoss()
+    IEnumerator WaitForAllMonstersAndFadeBGM()
     {
         // 몬스터가 모두 제거될 때까지 대기
         while (GameObject.FindGameObjectsWithTag("Monster").Length > 0)
         {
             yield return null;
+        }
+
+        // 모든 몬스터 제거 시 NormalBGM 페이드 아웃
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopBGMWithFade();
         }
 
         // 5초 대기 후 보스 소환
@@ -99,13 +91,18 @@ public class EnemySpawner : MonoBehaviour
         {
             SpawnBoss();
             bossSpawned = true;
+
+            // 보스 BGM 페이드 인
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayBossBGM();
+            }
         }
     }
 
     void SpawnBoss()
     {
         Vector3 spawnPos = transform.position; // EnemySpawner의 중심에서 바로 소환
-
         GameObject bossObj = Instantiate(bossPrefab, spawnPos, Quaternion.identity);
 
         BossMovement bossMovement = bossObj.GetComponent<BossMovement>();
@@ -117,14 +114,7 @@ public class EnemySpawner : MonoBehaviour
         {
             Debug.LogError("보스 프리팹에 BossMovement 컴포넌트 없음");
         }
-        // 여기서 BGM 전환 호출
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.BossAppeared();
-        }
     }
-
-
 
     Vector2 GetRandomPositionInBox()
     {

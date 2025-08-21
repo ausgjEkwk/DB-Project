@@ -17,8 +17,9 @@ public class AudioManager : MonoBehaviour
 
     [Header("Fade Settings")]
     public float fadeDuration = 1f;
+    public float delayBetweenFades = 1f;
 
-    private AudioSource audioSource;
+    private AudioSource activeSource;
     private Coroutine fadeCoroutine;
 
     private bool isBossActive = false;
@@ -30,8 +31,9 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.loop = true;
+
+            activeSource = gameObject.AddComponent<AudioSource>();
+            activeSource.loop = true;
         }
         else
         {
@@ -41,117 +43,112 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        PlayNormalBGM();
+        // AudioClip 사전 로드
+        if (normalBGM != null) normalBGM.LoadAudioData();
+        if (bossBGM != null) bossBGM.LoadAudioData();
+        if (playerDeathBGM != null) playerDeathBGM.LoadAudioData();
+
+        // NormalBGM 즉시 시작
+        if (normalBGM != null)
+        {
+            activeSource.clip = normalBGM;
+            activeSource.volume = 0f;
+            activeSource.loop = true;
+            activeSource.Play();
+            StartCoroutine(FadeIn(activeSource, normalVolume, fadeDuration));
+        }
     }
 
-    // 내부 BGM 페이드 전환
-    private void PlayBGMWithFade(AudioClip newClip, float targetVolume, bool loop)
+    private IEnumerator FadeIn(AudioSource source, float targetVolume, float duration)
     {
-        if (newClip == null) return;
-        if (audioSource.clip == newClip) return;
-
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
-
-        fadeCoroutine = StartCoroutine(FadeBGM(newClip, targetVolume, loop));
-    }
-
-    private IEnumerator FadeBGM(AudioClip newClip, float targetVolume, bool loop)
-    {
-        float startVolume = audioSource.volume;
+        float startVolume = source.volume;
         float time = 0f;
 
-        // 페이드 아웃
-        while (time < fadeDuration)
+        while (time < duration)
         {
             time += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(startVolume, 0f, time / fadeDuration);
+            source.volume = Mathf.Lerp(startVolume, targetVolume, time / duration);
             yield return null;
         }
 
-        audioSource.clip = newClip;
-        audioSource.loop = loop;
-        audioSource.Play();
-
-        // 페이드 인
-        time = 0f;
-        while (time < fadeDuration)
-        {
-            time += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(0f, targetVolume, time / fadeDuration);
-            yield return null;
-        }
-
-        audioSource.volume = targetVolume;
+        source.volume = targetVolume;
     }
 
-    // 🔹 일반 BGM
+    private IEnumerator FadeOut(AudioSource source, float duration)
+    {
+        float startVolume = source.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            source.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+        }
+
+        source.volume = 0f;
+        source.Stop();
+    }
+
     public void PlayNormalBGM()
     {
-        PlayBGMWithFade(normalBGM, normalVolume, true);
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+        fadeCoroutine = StartCoroutine(SwitchBGM(normalBGM, normalVolume, true));
         isBossActive = false;
         isPlayerDead = false;
     }
 
-    // 🔹 보스 BGM
     public void PlayBossBGM()
     {
-        PlayBGMWithFade(bossBGM, bossVolume, true);
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+        fadeCoroutine = StartCoroutine(SwitchBGM(bossBGM, bossVolume, true));
         isBossActive = true;
     }
 
-    // 🔹 플레이어 사망 BGM 즉시 재생
     public void PlayPlayerDeathBGM()
     {
         if (playerDeathBGM == null) return;
 
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
 
-        audioSource.Stop();
-        audioSource.clip = playerDeathBGM;
-        audioSource.volume = playerDeathVolume;
-        audioSource.loop = false;
-        audioSource.Play();
+        activeSource.Stop();
+        activeSource.clip = playerDeathBGM;
+        activeSource.volume = playerDeathVolume;
+        activeSource.loop = false;
+        activeSource.Play();
 
         isPlayerDead = true;
     }
 
-    // 🔹 BGM 정지 (페이드 아웃)
-    public void StopBGMWithFade()
+    private IEnumerator SwitchBGM(AudioClip newClip, float targetVolume, bool loop)
     {
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
-
-        fadeCoroutine = StartCoroutine(FadeOutAndStop());
-    }
-
-    private IEnumerator FadeOutAndStop()
-    {
-        float startVolume = audioSource.volume;
-        float time = 0f;
-
-        while (time < fadeDuration)
+        // 기존 곡 페이드 아웃
+        if (activeSource.isPlaying)
         {
-            time += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(startVolume, 0f, time / fadeDuration);
-            yield return null;
+            yield return FadeOut(activeSource, fadeDuration);
+            yield return new WaitForSecondsRealtime(delayBetweenFades);
         }
 
-        audioSource.Stop();
-        audioSource.clip = null;
-        audioSource.volume = startVolume;
-        isBossActive = false;
+        activeSource.clip = newClip;
+        activeSource.loop = loop;
+        activeSource.volume = 0f;
+        activeSource.Play();
+
+        yield return FadeIn(activeSource, targetVolume, fadeDuration);
     }
 
-    // 🔹 Retry 초기화
+    public void StopBGMWithFade()
+    {
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+        fadeCoroutine = StartCoroutine(FadeOut(activeSource, fadeDuration));
+    }
+
     public void RetryReset()
     {
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
 
-        audioSource.Stop();
-        audioSource.clip = null;
+        activeSource.Stop();
+        activeSource.clip = null;
 
         isPlayerDead = false;
         isBossActive = false;
@@ -159,16 +156,13 @@ public class AudioManager : MonoBehaviour
         PlayNormalBGM();
     }
 
-    // 🔹 외부 호출
     public void BossAppeared()
     {
-        if (!isBossActive && !isPlayerDead)
-            PlayBossBGM();
+        if (!isBossActive && !isPlayerDead) PlayBossBGM();
     }
 
     public void PlayerDied()
     {
-        if (!isPlayerDead)
-            PlayPlayerDeathBGM();
+        if (!isPlayerDead) PlayPlayerDeathBGM();
     }
 }

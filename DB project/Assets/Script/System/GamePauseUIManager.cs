@@ -98,19 +98,39 @@ public class GamePauseUIManager : MonoBehaviour
             case 0: // Continue
                 HidePauseUI(); // 일시정지 해제
                 break;
-            case 1: // Retry
-                if (TimeStop.Instance != null)
-                    Destroy(TimeStop.Instance.gameObject); // ★ TimeStop 제거
 
+            case 1: // Retry
+                    // TimeStop 제거
+                if (TimeStop.Instance != null)
+                    Destroy(TimeStop.Instance.gameObject);
+
+                // HealthUI 자동 초기화 방지
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
+                // 씬 로드 완료 후 NormalBGM 초기화
+                SceneManager.sceneLoaded += OnSceneReloadedForRetry;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
 
             case 2: // MainMenu
+                    // Menu씬 이동 전 AudioManager 제거
+                if (AudioManager.Instance != null)
+                    Destroy(AudioManager.Instance.gameObject);
+
                 SceneManager.LoadScene("Menu");
                 break;
+        }
+    }
+
+    // 씬 로드 완료 후 실행
+    private void OnSceneReloadedForRetry(Scene scene, LoadSceneMode mode)
+    {
+        SceneManager.sceneLoaded -= OnSceneReloadedForRetry;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.RetryReset(); // NormalBGM 재생 포함
         }
     }
 }
