@@ -83,6 +83,9 @@ public class PlayerShooter : MonoBehaviour
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             rb.velocity = Vector2.up * bulletSpeed;
+
+            // 공격 효과음 재생
+            AudioManager.Instance?.PlayPlayerAttackSFX();
         }
     }
 

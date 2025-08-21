@@ -1154,7 +1154,12 @@ MonoBehaviour:
   bossVolume: 0.15
   playerDeathBGM: {fileID: 8300000, guid: cdf2357ab7c686a4789ee428b99aa93e, type: 3}
   playerDeathVolume: 0.2
+  playerAttackClip: {fileID: 8300000, guid: d04571fb4d3ff634683af8ba6a3731a6, type: 3}
+  playerAttackVolume: 0.05
+  playerHitClip: {fileID: 8300000, guid: d6464ea152cc3c845b49e38d8b26307e, type: 3}
+  playerHitVolume: 0.3
   fadeDuration: 1
+  delayBetweenFades: 1
 --- !u!82 &519420035
 AudioSource:
   m_ObjectHideFlags: 0

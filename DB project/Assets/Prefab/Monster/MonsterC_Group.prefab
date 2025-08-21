@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 3
   currentHealth: 0
   isPlayer: 0
 --- !u!4 &4041987580883164522 stripped
@@ -211,7 +211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 3
   currentHealth: 0
   isPlayer: 0
 --- !u!1001 &3993531182563327686
@@ -236,7 +236,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2368288135366854525, guid: 53351302db7927040a01681ab5f2da3b, type: 3}
       propertyPath: bulletSpeed
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2627791521442975760, guid: 53351302db7927040a01681ab5f2da3b, type: 3}
       propertyPath: m_LocalPosition.x

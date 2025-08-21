@@ -32,17 +32,21 @@ public class MenuBGMManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        AudioListener listener = GetComponent<AudioListener>();
         if (scene.name == "Menu")
         {
             bgmSource.enabled = true;
             if (!bgmSource.isPlaying) bgmSource.Play();
-            GetComponent<AudioListener>().enabled = true;
+            if (listener != null)
+                listener.enabled = true;
         }
         else
         {
             if (bgmSource.isPlaying) bgmSource.Stop();
-            GetComponent<AudioListener>().enabled = false;
+            if (listener != null)
+                listener.enabled = false;
         }
     }
+
 
 }

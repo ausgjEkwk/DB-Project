@@ -20,6 +20,9 @@ public class PlayerHitBox : MonoBehaviour
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(1);
+
+                // 피격 효과음 재생
+                AudioManager.Instance?.PlayPlayerHitSFX();
             }
 
             // 탄환 제거

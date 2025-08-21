@@ -1,5 +1,4 @@
-﻿// GameOverUIManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameOverUIManager : MonoBehaviour
@@ -59,7 +58,6 @@ public class GameOverUIManager : MonoBehaviour
             AudioManager.Instance.PlayerDied();
     }
 
-
     private void UpdateSelectorPosition()
     {
         if (selector == null) return;
@@ -75,22 +73,32 @@ public class GameOverUIManager : MonoBehaviour
         switch (currentIndex)
         {
             case 0: // Main Menu
+                    // AudioManager에서 BGM만 페이드 아웃
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.StopBGMWithFade();
+                }
+
+                // Menu씬으로 이동
                 SceneManager.LoadScene("Menu");
                 break;
+
             case 1: // Retry
+                    // 시간 정지 인스턴스 제거
                 if (TimeStop.Instance != null)
                     Destroy(TimeStop.Instance.gameObject);
 
+                // HealthUIManager 자동 초기화 방지
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
-                // 🔹 Retry 시 BGM 리셋
+                // Retry 시 BGM 리셋
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.RetryReset();
 
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
-
         }
     }
+
 }

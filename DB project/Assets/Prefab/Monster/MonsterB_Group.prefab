@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 3
   currentHealth: 0
   isPlayer: 0
 --- !u!1001 &6131221327179439093
@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 3
   currentHealth: 0
   isPlayer: 0
 --- !u!1001 &7485639811913506581
@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72443ae5ff3fab449fd1ec7fecf73f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 3
   currentHealth: 0
   isPlayer: 0
 --- !u!4 &8440915446020488413 stripped
