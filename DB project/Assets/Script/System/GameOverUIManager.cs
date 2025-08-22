@@ -73,13 +73,12 @@ public class GameOverUIManager : MonoBehaviour
         switch (currentIndex)
         {
             case 0: // Main Menu
-                    // AudioManager에서 BGM만 페이드 아웃
+                    // 기존 BGM 페이드 아웃
                 if (AudioManager.Instance != null)
-                {
                     AudioManager.Instance.StopBGMWithFade();
-                }
 
-                // Menu씬으로 이동
+                // MainMenu 씬 로드 전에 GameOver 오브젝트 파괴
+                Destroy(this.gameObject); // GameOverUIManager 포함 오브젝트 삭제
                 SceneManager.LoadScene("Menu");
                 break;
 

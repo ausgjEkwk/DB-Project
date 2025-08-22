@@ -15,7 +15,7 @@ public class PlayerShooter : MonoBehaviour
     private List<SupportShooter> supportShooters = new List<SupportShooter>();
 
     // === 폭탄 관련 ===
-    private int boomCount = 3;
+    private int boomCount = 1;
     private int maxBoomCount = 3;
     private float boomRechargeTime = 10f;
     private float boomRechargeTimer = 0f;

@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 minBounds;
     private Vector2 maxBounds;
 
+    private bool areaLimitDisabled = false; // PlayArea 제한 비활성화 여부
+
     private Health health; // Health 컴포넌트 참조
 
     // ▼ 아이템 흡수 기능 관련 변수
@@ -73,11 +75,20 @@ public class PlayerController : MonoBehaviour
         Vector2 targetVelocity = input.normalized * moveSpeed;
         Vector2 newPosition = rb.position + targetVelocity * Time.fixedDeltaTime;
 
-        float clampedX = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
-        float clampedY = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
-
-        rb.MovePosition(new Vector2(clampedX, clampedY));
+        if (!areaLimitDisabled)
+        {
+            // PlayArea 제한이 켜져있으면 clamp 적용
+            float clampedX = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
+            float clampedY = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+            rb.MovePosition(new Vector2(clampedX, clampedY));
+        }
+        else
+        {
+            // 제한 해제 시 그대로 이동 (화면 밖 가능)
+            rb.MovePosition(newPosition);
+        }
     }
+
 
     public void AddItem()
     {
@@ -141,6 +152,22 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    public void DisableAreaLimit(bool disable)
+    {
+        areaLimitDisabled = disable;
+        if (!disable && areaLimit != null)
+        {
+            BoxCollider2D box = areaLimit.GetComponent<BoxCollider2D>();
+            if (box != null)
+            {
+                Bounds bounds = box.bounds;
+                minBounds = bounds.min;
+                maxBounds = bounds.max;
+            }
+        }
+    }
+
 
     // (선택) 아이템 흡수 반경 시각화 Gizmo
     private void OnDrawGizmosSelected()

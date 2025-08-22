@@ -225,10 +225,10 @@ MonoBehaviour:
   bossBulletPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
   bulletDistance: 1.5
   rotateSpeed: 360
-  totalRotations: 3
+  totalRotations: 4
   fireRate: 0.05
   launchInterval: 0.01
-  bulletSpeed: 8
+  bulletSpeed: 10
 --- !u!114 &8853531874228033820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +244,7 @@ MonoBehaviour:
   swordPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
   radius: 1.5
   swordCount: 8
-  swordSpeed: 10
+  swordSpeed: 15
   spawnDistanceInterval: 1
 --- !u!114 &-8530305315108535449
 MonoBehaviour:
@@ -262,7 +262,7 @@ MonoBehaviour:
   verticalSpacing: 2
   horizontalDistance: 2
   spawnCount: 9
-  bulletSpeed: 5
+  bulletSpeed: 8
 --- !u!114 &6117540330267148371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swordPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
-  moveSpeed: 1
+  moveSpeed: 2
   stepDistance: 0.25
   leftX: -2.5
   rightX: 2.5
@@ -297,3 +297,6 @@ MonoBehaviour:
   xMoveDuration: 2
   yRiseDuration: 0.5
   yRiseAmount: 3
+  playerXMoveDuration: 1
+  playerYMoveDuration: 1.5
+  playerYTarget: 7

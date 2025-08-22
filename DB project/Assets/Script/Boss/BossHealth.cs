@@ -1,35 +1,38 @@
-﻿// BossHealth.cs
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class BossHealth : MonoBehaviour
 {
+    [Header("Boss Settings")]
     public int maxHealth = 100;
     private int currentHealth;
-
     public float HealthPercent => (float)currentHealth / maxHealth;
 
+    [Header("UI")]
     public GameObject bossHealthUIPrefab;
-
     private BossHealthUI healthUIInstance;
 
-    private bool specialStarted = false;
-
-    private BossMovement bossMovement; // BossMovement 참조
-
     [Header("Death Movement Settings")]
-    public float xMoveDuration = 1f;    // X축 이동 시간
-    public float yRiseDuration = 1f;    // Y축 상승 시간
-    public float yRiseAmount = 3f;      // 상승 거리
+    public float xMoveDuration = 1f;
+    public float yRiseDuration = 2f;
+    public float yRiseAmount = 4f; // 보스 Y 상승량
 
+    [Header("Player Cutscene Settings")]
+    public float playerXMoveDuration = 1f;
+    public float playerYMoveDuration = 1.5f;
+    public float playerYTarget = 7f;
+
+    private StageClearUIManager stageClearUIManager;
+    private bool specialStarted = false;
     private bool isDead = false;
+    private BossMovement bossMovement;
 
     void Start()
     {
         currentHealth = maxHealth;
-
         bossMovement = GetComponent<BossMovement>();
 
+        // Health UI 생성
         if (bossHealthUIPrefab != null)
         {
             GameObject uiObj = Instantiate(bossHealthUIPrefab);
@@ -38,12 +41,44 @@ public class BossHealth : MonoBehaviour
                 uiObj.transform.SetParent(canvas.transform, false);
             else
                 Debug.LogWarning("씬에 Canvas 오브젝트가 없습니다!");
-
             healthUIInstance = uiObj.GetComponent<BossHealthUI>();
         }
 
         if (healthUIInstance != null)
             healthUIInstance.SetHealthPercent(1f);
+
+        // StageClearUIManager 생성/참조
+        stageClearUIManager = FindObjectOfType<StageClearUIManager>();
+        if (stageClearUIManager == null)
+        {
+            GameObject canvas = GameObject.Find("Canvas");
+            if (canvas != null)
+            {
+                GameObject uiObj = new GameObject("StageClearUI");
+                uiObj.transform.SetParent(canvas.transform, false);
+                stageClearUIManager = uiObj.AddComponent<StageClearUIManager>();
+
+                // clearPanel 생성
+                GameObject panel = new GameObject("ClearPanel");
+                panel.transform.SetParent(uiObj.transform, false);
+                RectTransform rt = panel.AddComponent<RectTransform>();
+                rt.sizeDelta = new Vector2(400, 200);
+                stageClearUIManager.clearPanel = panel;
+
+                // selector 생성
+                GameObject selectorObj = new GameObject("Selector");
+                selectorObj.transform.SetParent(panel.transform, false);
+                RectTransform srt = selectorObj.AddComponent<RectTransform>();
+                srt.anchoredPosition = Vector2.zero;
+                stageClearUIManager.selector = srt;
+
+                stageClearUIManager.clearPanel.SetActive(false);
+            }
+            else
+            {
+                Debug.LogWarning("StageClearUIManager 자동 생성 실패: Canvas 없음");
+            }
+        }
     }
 
     public void TakeDamage(int damage)
@@ -56,49 +91,35 @@ public class BossHealth : MonoBehaviour
         if (healthUIInstance != null)
             healthUIInstance.SetHealthPercent(HealthPercent);
 
-        // 특수패턴 자동 시작
         if (!specialStarted && HealthPercent < 0.5f)
         {
             specialStarted = true;
-
             BossSpecial bossSpecial = GetComponent<BossSpecial>();
             if (bossSpecial != null)
-            {
-                bossSpecial.TryStartSpecial(() =>
-                {
-                    specialStarted = false;
-                });
-            }
+                bossSpecial.TryStartSpecial(() => { specialStarted = false; });
         }
 
-        // 체력 0이면 사망 처리
         if (currentHealth <= 0)
         {
             isDead = true;
-
             if (bossMovement != null)
             {
-                bossMovement.StopAllCoroutines(); // 공격 루프 종료
-                bossMovement.ClearPatternSwords(); // 모든 패턴 칼 제거
+                bossMovement.StopAllCoroutines();
+                bossMovement.ClearPatternSwords();
             }
-
             StartCoroutine(DeathSequence());
         }
     }
 
-    IEnumerator DeathSequence()
+    private IEnumerator DeathSequence()
     {
-        // 보스 BGM 페이드 아웃
         if (AudioManager.Instance != null)
-        {
             AudioManager.Instance.StopBGMWithFade();
-        }
 
-        // 1️ X축 0으로 이동
+        // 1. Boss X=0 이동
         Vector3 startPos = transform.position;
         Vector3 targetPos = new Vector3(0f, startPos.y, startPos.z);
         float elapsed = 0f;
-
         while (elapsed < xMoveDuration)
         {
             transform.position = Vector3.Lerp(startPos, targetPos, elapsed / xMoveDuration);
@@ -107,35 +128,78 @@ public class BossHealth : MonoBehaviour
         }
         transform.position = targetPos;
 
-        // 2️ Y축 상승 (올라가는 동안 Bossbullet 제거)
-        startPos = transform.position;
-        targetPos = startPos + Vector3.up * yRiseAmount;
-        elapsed = 0f;
+        // 2. Boss Y 상승 (화면 밖)
+        Camera cam = Camera.main;
+        float camTop = cam.transform.position.y + cam.orthographicSize + 2f; // 화면 위 + 여유
+        targetPos = new Vector3(transform.position.x, camTop, transform.position.z); // 기존 targetPos 재사용
+        elapsed = 0f; // 기존 elapsed 재사용
 
         while (elapsed < yRiseDuration)
         {
             transform.position = Vector3.Lerp(startPos, targetPos, elapsed / yRiseDuration);
             elapsed += Time.deltaTime;
 
-            // 화면에 남아있는 Bossbullet 제거
-            GameObject[] bossBullets = GameObject.FindGameObjectsWithTag("BossBullet");
-            foreach (GameObject bullet in bossBullets)
-            {
-                Destroy(bullet);
-            }
+            // 화면에 남아있는 BossBullet 제거
+            GameObject[] bullets = GameObject.FindGameObjectsWithTag("BossBullet");
+            foreach (GameObject b in bullets)
+                Destroy(b);
 
             yield return null;
         }
 
+        transform.position = targetPos; // 마지막 위치 보정
+
+
+        Debug.Log("보스가 사망했습니다!");
+
+        // 3. Player 컷씬 (PlayArea 제한 해제)
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            PlayerController pc = player.GetComponent<PlayerController>();
+            if (pc != null)
+                pc.DisableAreaLimit(true); // 제한 해제
+            yield return StartCoroutine(MovePlayerToClearPosition(player));
+        }
+
+        // 4. StageClearUI 표시 (Player 화면 밖이면)
+        if (stageClearUIManager != null)
+        {
+            stageClearUIManager.ShowClearUI();
+        }
+
+        // 5. Boss 제거
         Die();
     }
 
-
-    void Die()
+    private IEnumerator MovePlayerToClearPosition(GameObject player)
     {
-        Debug.Log("보스가 사망했습니다!");
-        Destroy(gameObject);
+        Vector3 startPos = player.transform.position;
+        Vector3 targetX = new Vector3(0f, startPos.y, startPos.z);
+        float elapsed = 0f;
+        while (elapsed < playerXMoveDuration)
+        {
+            player.transform.position = Vector3.Lerp(startPos, targetX, elapsed / playerXMoveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        player.transform.position = targetX;
 
+        startPos = player.transform.position;
+        Vector3 targetY = new Vector3(0f, playerYTarget, startPos.z);
+        elapsed = 0f;
+        while (elapsed < playerYMoveDuration)
+        {
+            player.transform.position = Vector3.Lerp(startPos, targetY, elapsed / playerYMoveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        player.transform.position = targetY;
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
         if (healthUIInstance != null)
             Destroy(healthUIInstance.gameObject);
     }
