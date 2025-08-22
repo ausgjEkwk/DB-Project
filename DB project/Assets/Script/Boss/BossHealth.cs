@@ -132,16 +132,17 @@ public class BossHealth : MonoBehaviour
         Camera cam = Camera.main;
         float camTop = cam.transform.position.y + cam.orthographicSize + 2f; // 화면 위 + 여유
 
-        // 기존 startPos 재사용 (X 이동 후 위치)
-        targetPos = new Vector3(transform.position.x, camTop, transform.position.z); // 기존 targetPos 재사용
-        elapsed = 0f; // 기존 elapsed 재사용
+        Vector3 startPosY = transform.position; // X 이동 후 현재 위치 기준
+        Vector3 targetPosY = new Vector3(startPosY.x, camTop, startPosY.z);
+
+        elapsed = 0f; // Y 상승용 elapsed 초기화
 
         while (elapsed < yRiseDuration)
         {
-            transform.position = Vector3.Lerp(startPos, targetPos, elapsed / yRiseDuration);
+            transform.position = Vector3.Lerp(startPosY, targetPosY, elapsed / yRiseDuration);
             elapsed += Time.deltaTime;
 
-            // 체력 0 → 상승 중 화면에 남아있는 BossBullet 제거
+            // 상승 중 화면에 남아있는 BossBullet 제거
             GameObject[] bullets = GameObject.FindGameObjectsWithTag("BossBullet");
             foreach (GameObject b in bullets)
                 Destroy(b);
@@ -149,7 +150,7 @@ public class BossHealth : MonoBehaviour
             yield return null;
         }
 
-        transform.position = targetPos; // 마지막 위치 보정
+        transform.position = targetPosY; // 마지막 위치 보정
 
         Debug.Log("보스가 사망했습니다!");
 

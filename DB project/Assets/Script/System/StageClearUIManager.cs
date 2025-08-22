@@ -1,38 +1,44 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class StageClearUIManager : MonoBehaviour
 {
     [Header("References")]
-    public GameObject clearPanel;   // Å¬¸®¾î ÆĞ³Î
-    public RectTransform selector;  // È­»ìÇ¥ ÀÌ¹ÌÁö
+    public GameObject clearPanel;   // Stage Clear Panel
+    public RectTransform selector;  // í™”ì‚´í‘œ ì´ë¯¸ì§€
 
-    [Header("Selector Positions")]
-    public Vector2 option1Pos = new Vector2(-75f, -30f);   // ¿¹: ´ÙÀ½ ½ºÅ×ÀÌÁö
-    public Vector2 option2Pos = new Vector2(-45f, -100f);  // ¿¹: ¸ŞÀÎ ¸Ş´º
+    [Header("Selector Fixed Positions")]
+    public Vector2 mainMenuPos = new Vector2(-75f, -30f); // Main Menu
+    public Vector2 retryPos = new Vector2(-45f, -100f); // Retry
 
-    private int currentIndex = 0;
+    public bool IsShown => isShown;
+
+    private int currentIndex = 0; // 0 = Main Menu, 1 = Retry
+    private bool isShown = false;
 
     private void Start()
     {
-        clearPanel.SetActive(false);
+        if (clearPanel != null)
+            clearPanel.SetActive(false);
     }
 
     private void Update()
     {
-        if (!clearPanel.activeSelf) return;
+        if (!isShown) return;
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        // ìœ„/ì•„ë˜ ì´ë™
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
-            currentIndex = 0;
+            currentIndex = (currentIndex - 1 + 2) % 2;
             UpdateSelector();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            currentIndex = 1;
+            currentIndex = (currentIndex + 1) % 2;
             UpdateSelector();
         }
 
+        // ì„ íƒ
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             ActivateOption();
@@ -41,30 +47,51 @@ public class StageClearUIManager : MonoBehaviour
 
     public void ShowClearUI()
     {
-        clearPanel.SetActive(true);
+        isShown = true;
+        if (clearPanel != null)
+            clearPanel.SetActive(true);
+
+        Time.timeScale = 0f; // ê²Œì„ ì •ì§€ (í´ë¦¬ì–´ ì—°ì¶œ í›„ ì…ë ¥ ëŒ€ê¸°)
         currentIndex = 0;
         UpdateSelector();
     }
 
     private void UpdateSelector()
     {
-        if (currentIndex == 0)
-            selector.anchoredPosition = option1Pos;
-        else
-            selector.anchoredPosition = option2Pos;
+        if (selector == null) return;
+
+        Vector2 pos = currentIndex == 0 ? mainMenuPos : retryPos;
+        selector.anchoredPosition = pos;
     }
 
     private void ActivateOption()
     {
-        if (currentIndex == 0)
+        Time.timeScale = 1f; // ì”¬ ì´ë™ ì „ ì‹œê°„ ë³µêµ¬
+
+        switch (currentIndex)
         {
-            // ´ÙÀ½ ½ºÅ×ÀÌÁö ·Îµå
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        }
-        else
-        {
-            // ¸ŞÀÎ ¸Ş´º ÀÌµ¿
-            SceneManager.LoadScene("Menu");
+            case 0: // Main Menu
+                Destroy(this.gameObject);
+
+                // NormalBGM ì¬ìƒ ê°•ì œ í˜¸ì¶œ
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayNormalBGM();
+
+                SceneManager.LoadScene("Menu");
+                break;
+
+            case 1: // Retry (í˜„ì¬ ì”¬ ë‹¤ì‹œ ë¡œë“œ)
+                if (TimeStop.Instance != null)
+                    Destroy(TimeStop.Instance.gameObject);
+
+                if (HealthUIManager.Instance != null)
+                    HealthUIManager.Instance.SetPreventAutoInitialize(true);
+
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.RetryReset();
+
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                break;
         }
     }
 }
