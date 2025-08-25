@@ -78,6 +78,9 @@ public class EnemySpawner : MonoBehaviour
             yield return null;
         }
 
+        // 1초 대기 후 NormalBGM 페이드 아웃
+        yield return new WaitForSeconds(1f);
+
         // 모든 몬스터 제거 시 NormalBGM 페이드 아웃
         if (AudioManager.Instance != null)
         {

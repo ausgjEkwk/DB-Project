@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BossMovement : MonoBehaviour
 {
@@ -35,13 +36,25 @@ public class BossMovement : MonoBehaviour
 
     public void StartMovePattern()
     {
-        StartCoroutine(MoveSequence());
+        StartCoroutine(StartMovePatternRoutine());
     }
 
-    // 패턴 칼 등록
+    private IEnumerator StartMovePatternRoutine()
+    {
+        // 씬 전환 후 TimeStop.Instance가 활성화될 때까지 대기
+        while (TimeStop.Instance == null || !TimeStop.Instance.gameObject.activeInHierarchy)
+            yield return null;
+
+        // 씬 전환 직후 1프레임 대기
+        yield return null;
+
+        // MoveSequence 코루틴 실행
+        yield return StartCoroutine(MoveSequence());
+    }
+
+
     public void RegisterPatternSword(GameObject sword)
     {
-        // 사망 중이면 생성 차단
         BossHealth bossHealth = GetComponent<BossHealth>();
         if (bossHealth != null && bossHealth.HealthPercent <= 0f)
         {
@@ -49,7 +62,6 @@ public class BossMovement : MonoBehaviour
             return;
         }
 
-        // BossSpecial 진행 중이면 생성 차단
         if (bossSpecialScript != null && bossSpecialScript.IsRunning)
         {
             Destroy(sword);
@@ -60,14 +72,12 @@ public class BossMovement : MonoBehaviour
             patternSwords.Add(sword);
     }
 
-    // 기존 패턴 칼 제거
     public void ClearPatternSwords()
     {
         foreach (var sword in patternSwords)
-        {
             if (sword != null)
                 Destroy(sword);
-        }
+
         patternSwords.Clear();
     }
 
@@ -92,16 +102,14 @@ public class BossMovement : MonoBehaviour
                 yield return null;
             }
 
-            // BossSpecial 종료 후 패턴1부터 다시 시작
             pattern1Executed = false;
 
-            // 1️ 패턴1
+            // 1️⃣ 패턴1
             if (!pattern1Executed)
             {
                 while (!Mathf.Approximately(transform.position.x, 0f))
                     yield return StartCoroutine(MoveTo(new Vector3(0f, transform.position.y, 0f), moveSpeed));
 
-                // BossSpecial 진행 중이면 실행 차단
                 if (pattern1Script != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
                     yield return StartCoroutine(pattern1Script.StartPattern());
 
@@ -109,7 +117,7 @@ public class BossMovement : MonoBehaviour
                 yield return new WaitForSeconds(1f);
             }
 
-            // 2️ 왼쪽 이동
+            // 2️⃣ 왼쪽 이동
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
@@ -118,14 +126,15 @@ public class BossMovement : MonoBehaviour
             yield return StartCoroutine(MoveTo(new Vector3(-2.5f, transform.position.y, 0f), moveSpeed));
             yield return new WaitForSeconds(1f);
 
-            // 3️ 오른쪽 이동 + 잔상 + 패턴2
+            // 3️⃣ 오른쪽 이동 + 잔상 + 패턴2
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
             if (flipController != null) flipController.FaceRight();
             animator.Play("Boss_MoveRight");
 
-            if (TimeStop.Instance != null)
+            // 씬 전환 후에도 TimeStop이 항상 적용되도록 보장
+            if (TimeStop.Instance != null && !TimeStop.Instance.IsTimeStopped)
                 TimeStop.Instance.StartTimeStop();
 
             if (pattern2Script != null)
@@ -133,7 +142,7 @@ public class BossMovement : MonoBehaviour
 
             yield return StartCoroutine(MoveToWithPatternUpdate(new Vector3(2.5f, transform.position.y, 0f), moveSpeedWithGhost));
 
-            if (TimeStop.Instance != null)
+            if (TimeStop.Instance != null && TimeStop.Instance.IsTimeStopped)
             {
                 TimeStop.Instance.EndTimeStop();
                 if (pattern2Script != null)
@@ -142,7 +151,7 @@ public class BossMovement : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
 
-            // 4️ 가운데 복귀
+            // 4️⃣ 가운데 복귀
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
@@ -151,15 +160,19 @@ public class BossMovement : MonoBehaviour
             yield return StartCoroutine(MoveTo(new Vector3(0f, transform.position.y, 0f), moveSpeed));
             animator.Play("Boss_Idle");
 
-            // 5️ 패턴3 실행
+            // 5️⃣ 패턴3 실행
             while (bossSpecialScript != null && bossSpecialScript.IsRunning)
                 yield return null;
 
             if (pattern3Script != null && TimeStop.Instance != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
             {
-                TimeStop.Instance.StartTimeStop();
+                if (!TimeStop.Instance.IsTimeStopped)
+                    TimeStop.Instance.StartTimeStop();
+
                 yield return StartCoroutine(pattern3Script.ExecutePattern());
-                TimeStop.Instance.EndTimeStop();
+
+                if (TimeStop.Instance.IsTimeStopped)
+                    TimeStop.Instance.EndTimeStop();
             }
 
             pattern1Executed = false;

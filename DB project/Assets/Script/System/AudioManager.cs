@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
-
-// AudioManager : 게임 전체 BGM 및 SFX 관리
-// - BGM: 일반, 보스, 플레이어 사망 지원
-// - SFX: 플레이어 공격, 피격 지원 (볼륨 개별 조절 가능)
-// - 페이드인/페이드아웃, Singleton 구조
 
 public class AudioManager : MonoBehaviour
 {
@@ -21,22 +17,22 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float playerDeathVolume = 1f;
 
     [Header("SFX Clips")]
-    public AudioClip playerAttackClip;   // 플레이어 공격 효과음
-    [Range(0f, 1f)] public float playerAttackVolume = 1f; // 공격 볼륨 (개별)
+    public AudioClip playerAttackClip;
+    [Range(0f, 1f)] public float playerAttackVolume = 1f;
 
-    public AudioClip playerHitClip;      // 플레이어 피격 효과음
-    [Range(0f, 1f)] public float playerHitVolume = 1f;    // 피격 볼륨 (개별)
+    public AudioClip playerHitClip;
+    [Range(0f, 1f)] public float playerHitVolume = 1f;
 
     [Header("Fade Settings")]
-    public float fadeDuration = 1f;      // BGM 페이드 인/아웃 시간
-    public float delayBetweenFades = 1f; // BGM 전환 시 대기 시간
+    public float fadeDuration = 1f;
+    public float delayBetweenFades = 1f;
 
-    private AudioSource activeSource;    // BGM 전용 AudioSource
-    private AudioSource sfxSource;       // SFX 전용 AudioSource
-    private Coroutine fadeCoroutine;     // BGM 페이드 코루틴 저장
+    private AudioSource activeSource;
+    private AudioSource sfxSource;
+    private Coroutine fadeCoroutine;
 
-    private bool isBossActive = false;   // 보스 등장 여부
-    private bool isPlayerDead = false;   // 플레이어 사망 여부
+    private bool isBossActive = false;
+    private bool isPlayerDead = false;
 
     private void Awake()
     {
@@ -45,7 +41,7 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // 🔹 기존 씬 AudioListener 제거 (중복 방지)
+            // AudioListener 중복 방지
             AudioListener[] listeners = FindObjectsOfType<AudioListener>();
             foreach (var listener in listeners)
             {
@@ -53,11 +49,9 @@ public class AudioManager : MonoBehaviour
                     Destroy(listener);
             }
 
-            // BGM용 AudioSource 초기화
             activeSource = gameObject.AddComponent<AudioSource>();
             activeSource.loop = true;
 
-            // SFX용 AudioSource 초기화
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.loop = false;
             sfxSource.playOnAwake = false;
@@ -68,22 +62,42 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this) Instance = null;
+    }
 
     private void Start()
     {
-        // AudioClip 미리 로드
         normalBGM?.LoadAudioData();
         bossBGM?.LoadAudioData();
         playerDeathBGM?.LoadAudioData();
 
-        // NormalBGM 자동 재생
-        if (normalBGM != null)
+        if (SceneManager.GetActiveScene().name == "Main")
         {
-            activeSource.clip = normalBGM;
-            activeSource.volume = 0f;
-            activeSource.loop = true;
-            activeSource.Play();
-            StartCoroutine(FadeIn(activeSource, normalVolume, fadeDuration)); // 페이드 인
+            PlayNormalBGM();
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Menu씬에서는 아무것도 하지 않음 → MenuBGMManager 전담
+        if (scene.name == "Menu") return;
+
+        // Main씬 진입 시
+        if (scene.name == "Main")
+        {
+            // 이전 Boss/PlayerDeath 상태도 초기화 후 NormalBGM
+            StopBGMWithFadeImmediate();
+            isBossActive = false;
+            isPlayerDead = false;
+            PlayNormalBGM();
         }
     }
 
@@ -167,11 +181,16 @@ public class AudioManager : MonoBehaviour
         fadeCoroutine = StartCoroutine(FadeOut(activeSource, fadeDuration));
     }
 
-    public void RetryReset()
+    private void StopBGMWithFadeImmediate()
     {
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         activeSource.Stop();
-        activeSource.clip = null;
+        activeSource.volume = 0f;
+    }
+
+    public void RetryReset()
+    {
+        StopBGMWithFadeImmediate();
         isPlayerDead = false;
         isBossActive = false;
         PlayNormalBGM();
@@ -189,7 +208,6 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region SFX Control
-    // 플레이어 공격 SFX
     public void PlayPlayerAttackSFX(float volume = -1f)
     {
         float v = (volume < 0f) ? playerAttackVolume : Mathf.Clamp01(volume);
@@ -197,7 +215,6 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(playerAttackClip, v);
     }
 
-    // 플레이어 피격 SFX
     public void PlayPlayerHitSFX(float volume = -1f)
     {
         float v = (volume < 0f) ? playerHitVolume : Mathf.Clamp01(volume);
@@ -205,20 +222,8 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(playerHitClip, v);
     }
 
-    // 런타임 볼륨 조절
-    public void SetAttackVolume(float volume)
-    {
-        playerAttackVolume = Mathf.Clamp01(volume);
-    }
-
-    public void SetHitVolume(float volume)
-    {
-        playerHitVolume = Mathf.Clamp01(volume);
-    }
-
-    public void SetBGMVolume(float volume)
-    {
-        activeSource.volume = Mathf.Clamp01(volume);
-    }
+    public void SetAttackVolume(float volume) => playerAttackVolume = Mathf.Clamp01(volume);
+    public void SetHitVolume(float volume) => playerHitVolume = Mathf.Clamp01(volume);
+    public void SetBGMVolume(float volume) => activeSource.volume = Mathf.Clamp01(volume);
     #endregion
 }

@@ -1,22 +1,20 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class TimeStop : MonoBehaviour
 {
     public static TimeStop Instance { get; private set; }
-
     public GameObject grayscaleOverlayUI; // 흑백 UI 오버레이
 
     private Animator playerAnimator;
     private float originalPlayerAnimatorSpeed = 1f;
-
     private PlayerShooter playerShooter;
     private List<Animator> supportAnimators = new List<Animator>();
     private List<float> supportAnimatorSpeeds = new List<float>();
 
     public bool IsTimeStopped { get; private set; } = false;
-
-    // 외부에서 확인 가능
     public static bool IsStopped => Instance != null && Instance.IsTimeStopped;
 
     private void Awake()
@@ -25,10 +23,35 @@ public class TimeStop : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StartCoroutine(AssignGrayscaleOverlay());
+    }
+
+    private IEnumerator AssignGrayscaleOverlay()
+    {
+        // 씬이 완전히 초기화될 때까지 2프레임 대기
+        yield return null;
+        yield return null;
+
+        // EffectCanvas 하위 GrayscaleOverlay 검색
+        GameObject canvasObj = GameObject.Find("EffectCanvas");
+        if (canvasObj != null)
+        {
+            Transform overlay = canvasObj.transform.Find("GrayscaleOverlay");
+            if (overlay != null)
+            {
+                grayscaleOverlayUI = overlay.gameObject;
+                grayscaleOverlayUI.SetActive(false); // 초기화
+            }
         }
     }
 
@@ -41,7 +64,6 @@ public class TimeStop : MonoBehaviour
         if (player != null)
         {
             player.enabled = false;
-
             playerAnimator = player.GetComponent<Animator>();
             if (playerAnimator != null)
             {
@@ -57,7 +79,6 @@ public class TimeStop : MonoBehaviour
         // SupportShooter 정지
         supportAnimators.Clear();
         supportAnimatorSpeeds.Clear();
-
         SupportShooter[] shooters = FindObjectsOfType<SupportShooter>();
         foreach (SupportShooter shooter in shooters)
         {
@@ -94,10 +115,8 @@ public class TimeStop : MonoBehaviour
         if (player != null)
         {
             player.enabled = true;
-
             if (playerAnimator != null)
                 playerAnimator.speed = originalPlayerAnimatorSpeed;
-
             if (playerShooter != null)
                 playerShooter.enabled = true;
         }
@@ -107,7 +126,6 @@ public class TimeStop : MonoBehaviour
         for (int i = 0; i < shooters.Length; i++)
         {
             shooters[i].enabled = true;
-
             Animator anim = shooters[i].GetComponent<Animator>();
             if (anim != null && i < supportAnimatorSpeeds.Count)
                 anim.speed = supportAnimatorSpeeds[i];

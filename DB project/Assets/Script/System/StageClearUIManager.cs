@@ -9,7 +9,7 @@ public class StageClearUIManager : MonoBehaviour
 
     [Header("Selector Fixed Positions")]
     public Vector2 mainMenuPos = new Vector2(-75f, -30f); // Main Menu
-    public Vector2 retryPos = new Vector2(-45f, -100f); // Retry
+    public Vector2 retryPos = new Vector2(-45f, -100f);   // Retry
 
     public bool IsShown => isShown;
 
@@ -73,10 +73,7 @@ public class StageClearUIManager : MonoBehaviour
             case 0: // Main Menu
                 Destroy(this.gameObject);
 
-                // NormalBGM 재생 강제 호출
-                if (AudioManager.Instance != null)
-                    AudioManager.Instance.PlayNormalBGM();
-
+                // 🔹 여기서는 NormalBGM 실행하지 않음
                 SceneManager.LoadScene("Menu");
                 break;
 
@@ -87,6 +84,7 @@ public class StageClearUIManager : MonoBehaviour
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
+                // Retry 시 BGM 리셋
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.RetryReset();
 
