@@ -38,7 +38,7 @@ public class GameOverUIManager : MonoBehaviour
         }
 
         // 선택
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
         {
             ActivateCurrent();
         }

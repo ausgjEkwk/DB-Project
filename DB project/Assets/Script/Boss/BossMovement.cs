@@ -41,17 +41,13 @@ public class BossMovement : MonoBehaviour
 
     private IEnumerator StartMovePatternRoutine()
     {
-        // 씬 전환 후 TimeStop.Instance가 활성화될 때까지 대기
         while (TimeStop.Instance == null || !TimeStop.Instance.gameObject.activeInHierarchy)
             yield return null;
 
-        // 씬 전환 직후 1프레임 대기
         yield return null;
 
-        // MoveSequence 코루틴 실행
         yield return StartCoroutine(MoveSequence());
     }
-
 
     public void RegisterPatternSword(GameObject sword)
     {
@@ -62,7 +58,8 @@ public class BossMovement : MonoBehaviour
             return;
         }
 
-        if (bossSpecialScript != null && bossSpecialScript.IsRunning)
+        if ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+            (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
         {
             Destroy(sword);
             return;
@@ -83,7 +80,6 @@ public class BossMovement : MonoBehaviour
 
     IEnumerator MoveSequence()
     {
-        // 첫 등장 시 아래로 이동
         if (!hasMovedDown)
         {
             Vector3 targetPos = transform.position + Vector3.down * 3f;
@@ -95,8 +91,9 @@ public class BossMovement : MonoBehaviour
         {
             animator.Play("Boss_Idle");
 
-            // BossSpecial 진행 중이면 모든 패턴 칼 제거 후 대기
-            while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            // BossSpecial or ESC 일시정지 대기
+            while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                   (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
             {
                 ClearPatternSwords();
                 yield return null;
@@ -110,7 +107,7 @@ public class BossMovement : MonoBehaviour
                 while (!Mathf.Approximately(transform.position.x, 0f))
                     yield return StartCoroutine(MoveTo(new Vector3(0f, transform.position.y, 0f), moveSpeed));
 
-                if (pattern1Script != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
+                if (pattern1Script != null)
                     yield return StartCoroutine(pattern1Script.StartPattern());
 
                 pattern1Executed = true;
@@ -118,7 +115,8 @@ public class BossMovement : MonoBehaviour
             }
 
             // 2️⃣ 왼쪽 이동
-            while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                   (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
 
             if (flipController != null) flipController.FaceLeft();
@@ -127,13 +125,13 @@ public class BossMovement : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             // 3️⃣ 오른쪽 이동 + 잔상 + 패턴2
-            while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                   (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
 
             if (flipController != null) flipController.FaceRight();
             animator.Play("Boss_MoveRight");
 
-            // 씬 전환 후에도 TimeStop이 항상 적용되도록 보장
             if (TimeStop.Instance != null && !TimeStop.Instance.IsTimeStopped)
                 TimeStop.Instance.StartTimeStop();
 
@@ -152,7 +150,8 @@ public class BossMovement : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             // 4️⃣ 가운데 복귀
-            while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                   (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
 
             if (flipController != null) flipController.FaceLeft();
@@ -161,10 +160,11 @@ public class BossMovement : MonoBehaviour
             animator.Play("Boss_Idle");
 
             // 5️⃣ 패턴3 실행
-            while (bossSpecialScript != null && bossSpecialScript.IsRunning)
+            while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                   (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
 
-            if (pattern3Script != null && TimeStop.Instance != null && (bossSpecialScript == null || !bossSpecialScript.IsRunning))
+            if (pattern3Script != null && TimeStop.Instance != null)
             {
                 if (!TimeStop.Instance.IsTimeStopped)
                     TimeStop.Instance.StartTimeStop();
@@ -184,20 +184,26 @@ public class BossMovement : MonoBehaviour
     {
         while (Vector3.Distance(transform.position, target) > 0.01f)
         {
-            if (bossSpecialScript == null || !bossSpecialScript.IsRunning)
+            if ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
             {
-                transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
-
-                ghostSpawnTimer += Time.deltaTime;
-                if (ghostSpawnTimer >= ghostSpawnInterval)
-                {
-                    SpawnGhost();
-                    ghostSpawnTimer = 0f;
-                }
-
-                if (pattern2Script != null)
-                    pattern2Script.UpdatePatternDuringMove();
+                ClearPatternSwords();
+                yield return null;
+                continue;
             }
+
+            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+
+            ghostSpawnTimer += Time.deltaTime;
+            if (ghostSpawnTimer >= ghostSpawnInterval)
+            {
+                SpawnGhost();
+                ghostSpawnTimer = 0f;
+            }
+
+            if (pattern2Script != null)
+                pattern2Script.UpdatePatternDuringMove();
+
             yield return null;
         }
         transform.position = target;
@@ -212,18 +218,28 @@ public class BossMovement : MonoBehaviour
 
         while (elapsed < travelTime)
         {
-            if (bossSpecialScript == null || !bossSpecialScript.IsRunning)
-                transform.position = Vector3.Lerp(start, target, elapsed / travelTime);
+            if ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+                (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
+            {
+                ClearPatternSwords();
+                yield return null;
+                continue;
+            }
 
             elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(start, target, elapsed / travelTime);
             yield return null;
         }
+
         transform.position = target;
     }
 
     void SpawnGhost()
     {
-        if (ghostPrefab == null || (bossSpecialScript != null && bossSpecialScript.IsRunning)) return;
+        if (ghostPrefab == null ||
+            (bossSpecialScript != null && bossSpecialScript.IsRunning) ||
+            (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
+            return;
 
         GameObject ghost = Instantiate(ghostPrefab, transform.position, transform.rotation);
         SpriteRenderer ghostSR = ghost.GetComponent<SpriteRenderer>();

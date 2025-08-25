@@ -48,44 +48,70 @@ public class BossSpecial : MonoBehaviour
     {
         isRunning = true;
 
-        yield return MoveToPositionUnscaled(new Vector3(leftX, transform.position.y, transform.position.z));
+        // 좌측 끝으로 이동
+        yield return MoveToPosition(new Vector3(leftX, transform.position.y, transform.position.z));
 
         Vector3 currentPos = transform.position;
 
         while (currentPos.x < rightX)
         {
+            while (IsPausedOrStopped())
+                yield return null;
+
             Vector3 nextPos = currentPos + new Vector3(stepDistance, 0f, 0f);
             if (nextPos.x > rightX) nextPos.x = rightX;
-            yield return MoveToPositionUnscaled(nextPos);
+
+            yield return MoveToPosition(nextPos);
             currentPos = nextPos;
+
+            while (IsPausedOrStopped())
+                yield return null;
 
             if (TimeStop.Instance != null)
                 TimeStop.Instance.StartTimeStop();
 
             FireBulletsInLowerHalfCircle();
 
+            while (IsPausedOrStopped())
+                yield return null;
+
+            // 다음 이동
             nextPos = currentPos + new Vector3(stepDistance, 0f, 0f);
             if (nextPos.x > rightX) nextPos.x = rightX;
-            yield return MoveToPositionUnscaled(nextPos);
+
+            yield return MoveToPosition(nextPos);
             currentPos = nextPos;
 
             if (TimeStop.Instance != null)
                 TimeStop.Instance.EndTimeStop();
         }
 
-        yield return MoveToPositionUnscaled(new Vector3(0f, transform.position.y, transform.position.z));
+        // 가운데로 이동
+        while (IsPausedOrStopped())
+            yield return null;
+
+        yield return MoveToPosition(new Vector3(0f, transform.position.y, transform.position.z));
 
         isRunning = false;
         isFinished = true;
-
         onComplete?.Invoke();
     }
 
-    private IEnumerator MoveToPositionUnscaled(Vector3 target)
+    // ESC 일시정지 체크
+    private bool IsPausedOrStopped()
+    {
+        return GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown;
+    }
+
+    // ESC 일시정지 적용된 이동
+    private IEnumerator MoveToPosition(Vector3 target)
     {
         while (Vector3.Distance(transform.position, target) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.unscaledDeltaTime);
+            while (IsPausedOrStopped())
+                yield return null;
+
+            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
             yield return null;
         }
         transform.position = target;
@@ -93,6 +119,8 @@ public class BossSpecial : MonoBehaviour
 
     private void FireBulletsInLowerHalfCircle()
     {
+        if (IsPausedOrStopped()) return;
+
         int bulletCount = 10;
         float startAngle = 0f;
         float endAngle = -180f;
@@ -104,7 +132,6 @@ public class BossSpecial : MonoBehaviour
             Vector2 dir = DegreeToVector2(angle).normalized;
 
             GameObject bullet = Instantiate(swordPrefab, transform.position, Quaternion.identity);
-
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
@@ -129,6 +156,9 @@ public class BossSpecial : MonoBehaviour
 
         while (timer < lifeTime && bulletTransform != null)
         {
+            while (IsPausedOrStopped())
+                yield return null;
+
             if (!isPaused)
             {
                 bulletTransform.Translate(direction * speed * Time.deltaTime, Space.World);

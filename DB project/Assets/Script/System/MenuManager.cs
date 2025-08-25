@@ -56,7 +56,7 @@ public class MenuManager : MonoBehaviour
             selectedIndex = (selectedIndex + 1) % menuOptions.Length;
             UpdateMenuUI();
         }
-        else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
         {
             if (selectedIndex == 0) // Start
             {

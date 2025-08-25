@@ -102,6 +102,12 @@ public class BossHealth : MonoBehaviour
         if (currentHealth <= 0)
         {
             isDead = true;
+
+            // 보스 사망 시점에서 즉시 모든 BossBullet 제거
+            GameObject[] bullets = GameObject.FindGameObjectsWithTag("BossBullet");
+            foreach (GameObject b in bullets)
+                Destroy(b);
+
             if (bossMovement != null)
             {
                 bossMovement.StopAllCoroutines();
@@ -110,6 +116,7 @@ public class BossHealth : MonoBehaviour
             StartCoroutine(DeathSequence());
         }
     }
+
 
     private IEnumerator DeathSequence()
     {

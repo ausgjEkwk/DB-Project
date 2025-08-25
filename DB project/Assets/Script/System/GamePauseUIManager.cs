@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class GamePauseUIManager : MonoBehaviour
 {
+    // === ΩÃ±€≈Ê ¿ŒΩ∫≈œΩ∫ ===
+    public static GamePauseUIManager Instance { get; private set; }
+
     [Header("References")]
     public GameObject pausePanel;
     public RectTransform selector;
@@ -43,7 +46,7 @@ public class GamePauseUIManager : MonoBehaviour
             UpdateSelectorPosition();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
         {
             ActivateCurrent();
         }

@@ -33,8 +33,13 @@ public class TimeStop : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        StartCoroutine(AssignGrayscaleOverlay());
+        // TimeStop 오브젝트가 살아있는 경우에만 코루틴 실행
+        if (this != null)
+        {
+            StartCoroutine(AssignGrayscaleOverlay());
+        }
     }
+
 
     private IEnumerator AssignGrayscaleOverlay()
     {
