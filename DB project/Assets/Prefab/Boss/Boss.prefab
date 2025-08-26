@@ -223,9 +223,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossBulletPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
-  bulletDistance: 1.5
+  bulletDistance: 1
   rotateSpeed: 360
-  totalRotations: 4
+  totalRotations: 5
   fireRate: 0.05
   launchInterval: 0.01
   bulletSpeed: 10
