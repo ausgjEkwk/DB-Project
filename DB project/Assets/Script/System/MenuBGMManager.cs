@@ -11,6 +11,8 @@ public class MenuBGMManager : MonoBehaviour
     [Header("SFX - Select")]
     public AudioSource selectSource; // 선택 효과음 전용
     public AudioClip selectClip;     // 선택 효과음
+    [Range(0f, 1f)]
+    public float selectVolume = 1f;  // 선택 효과음 볼륨
 
     private void Awake()
     {
@@ -53,6 +55,6 @@ public class MenuBGMManager : MonoBehaviour
     public void PlaySelectSFX()
     {
         if (selectSource != null && selectClip != null)
-            selectSource.PlayOneShot(selectClip);
+            selectSource.PlayOneShot(selectClip, selectVolume);
     }
 }
