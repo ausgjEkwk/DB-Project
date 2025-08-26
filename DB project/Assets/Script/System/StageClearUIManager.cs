@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class StageClearUIManager : MonoBehaviour
 {
+    public static StageClearUIManager Instance { get; private set; } // ← 추가
+
     [Header("References")]
     public GameObject clearPanel;   // Stage Clear Panel
     public RectTransform selector;  // 화살표 이미지
@@ -15,6 +17,16 @@ public class StageClearUIManager : MonoBehaviour
 
     private int currentIndex = 0; // 0 = Main Menu, 1 = Retry
     private bool isShown = false;
+
+    private void Awake() // ← 추가
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -72,8 +84,6 @@ public class StageClearUIManager : MonoBehaviour
         {
             case 0: // Main Menu
                 Destroy(this.gameObject);
-
-                // 🔹 여기서는 NormalBGM 실행하지 않음
                 SceneManager.LoadScene("Menu");
                 break;
 
@@ -84,7 +94,6 @@ public class StageClearUIManager : MonoBehaviour
                 if (HealthUIManager.Instance != null)
                     HealthUIManager.Instance.SetPreventAutoInitialize(true);
 
-                // Retry 시 BGM 리셋
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.RetryReset();
 

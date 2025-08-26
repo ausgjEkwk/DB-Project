@@ -93,7 +93,6 @@ public class AudioManager : MonoBehaviour
         // Main씬 진입 시
         if (scene.name == "Main")
         {
-            // 이전 Boss/PlayerDeath 상태도 초기화 후 NormalBGM
             StopBGMWithFadeImmediate();
             isBossActive = false;
             isPlayerDead = false;
@@ -207,9 +206,13 @@ public class AudioManager : MonoBehaviour
     }
     #endregion
 
-    #region SFX Control
+    #region SFX Control (StageClearUI 대응)
     public void PlayPlayerAttackSFX(float volume = -1f)
     {
+        // StageClearUI 열려 있으면 재생 금지
+        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown)
+            return;
+
         float v = (volume < 0f) ? playerAttackVolume : Mathf.Clamp01(volume);
         if (playerAttackClip != null)
             sfxSource.PlayOneShot(playerAttackClip, v);
@@ -217,6 +220,10 @@ public class AudioManager : MonoBehaviour
 
     public void PlayPlayerHitSFX(float volume = -1f)
     {
+        // StageClearUI 열려 있으면 재생 금지
+        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown)
+            return;
+
         float v = (volume < 0f) ? playerHitVolume : Mathf.Clamp01(volume);
         if (playerHitClip != null)
             sfxSource.PlayOneShot(playerHitClip, v);

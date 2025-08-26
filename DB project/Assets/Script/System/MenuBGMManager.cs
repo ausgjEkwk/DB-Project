@@ -1,26 +1,30 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MenuBGMManager : MonoBehaviour
 {
-    public AudioSource bgmSource; // Menu¾À¿¡¼­ Àç»ıÇÒ BGM
+    public static MenuBGMManager Instance { get; private set; }
+
+    [Header("BGM")]
+    public AudioSource bgmSource; // Menu ì”¬ BGM
+
+    [Header("SFX - Select")]
+    public AudioSource selectSource; // ì„ íƒ íš¨ê³¼ìŒ ì „ìš©
+    public AudioClip selectClip;     // ì„ íƒ íš¨ê³¼ìŒ
 
     private void Awake()
     {
-        var existing = FindObjectsOfType<MenuBGMManager>();
-        if (existing.Length > 1)
+        if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // ÀÌ¹Ì Á¸ÀçÇÏ¸é »èÁ¦
+            Destroy(gameObject);
             return;
         }
-
+        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
-
     private void OnEnable()
     {
-        // ¾ÀÀÌ ¹Ù²ğ ¶§¸¶´Ù È®ÀÎ
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -36,16 +40,19 @@ public class MenuBGMManager : MonoBehaviour
         {
             bgmSource.enabled = true;
             if (!bgmSource.isPlaying) bgmSource.Play();
-            if (listener != null)
-                listener.enabled = true;
+            if (listener != null) listener.enabled = true;
         }
         else
         {
             if (bgmSource.isPlaying) bgmSource.Stop();
-            if (listener != null)
-                listener.enabled = false;
+            if (listener != null) listener.enabled = false;
         }
     }
 
-
+    // ì„ íƒ íš¨ê³¼ìŒë§Œ ì¬ìƒ (Z/Enter ëˆŒë €ì„ ë•Œ)
+    public void PlaySelectSFX()
+    {
+        if (selectSource != null && selectClip != null)
+            selectSource.PlayOneShot(selectClip);
+    }
 }
