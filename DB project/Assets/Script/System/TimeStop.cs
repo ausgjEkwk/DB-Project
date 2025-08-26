@@ -1,28 +1,30 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TimeStop : MonoBehaviour
 {
-    public static TimeStop Instance { get; private set; }
-    public GameObject grayscaleOverlayUI; // 흑백 UI 오버레이
+    public static TimeStop Instance { get; private set; }  // 싱글톤
+    public GameObject grayscaleOverlayUI;                  // 흑백 UI 오버레이
 
     private Animator playerAnimator;
     private float originalPlayerAnimatorSpeed = 1f;
     private PlayerShooter playerShooter;
+
     private List<Animator> supportAnimators = new List<Animator>();
     private List<float> supportAnimatorSpeeds = new List<float>();
 
-    public bool IsTimeStopped { get; private set; } = false;
-    public static bool IsStopped => Instance != null && Instance.IsTimeStopped;
+    public bool IsTimeStopped { get; private set; } = false;                 // 현재 시간정지 상태
+    public static bool IsStopped => Instance != null && Instance.IsTimeStopped; // 전역 접근용
 
     private void Awake()
     {
+        // 싱글톤 설정
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // 씬 전환 시 파괴되지 않음
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
@@ -33,7 +35,7 @@ public class TimeStop : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // TimeStop 오브젝트가 살아있는 경우에만 코루틴 실행
+        // 씬 로드 후 UI 오브젝트 연결
         if (this != null)
         {
             StartCoroutine(AssignGrayscaleOverlay());
@@ -42,7 +44,7 @@ public class TimeStop : MonoBehaviour
 
     private IEnumerator AssignGrayscaleOverlay()
     {
-        // 씬이 완전히 초기화될 때까지 2프레임 대기
+        // 씬 초기화 대기
         yield return null;
         yield return null;
 
@@ -54,16 +56,17 @@ public class TimeStop : MonoBehaviour
             if (overlay != null)
             {
                 grayscaleOverlayUI = overlay.gameObject;
-                grayscaleOverlayUI.SetActive(false); // 초기화
+                grayscaleOverlayUI.SetActive(false); // 초기 비활성화
             }
         }
     }
 
+    // 시간정지 시작
     public void StartTimeStop()
     {
         IsTimeStopped = true;
 
-        // 플레이어 정지
+        // --- 플레이어 정지 ---
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player != null)
         {
@@ -72,15 +75,15 @@ public class TimeStop : MonoBehaviour
             if (playerAnimator != null)
             {
                 originalPlayerAnimatorSpeed = playerAnimator.speed;
-                playerAnimator.speed = 0f;
+                playerAnimator.speed = 0f; // 애니메이션 정지
             }
 
             playerShooter = player.GetComponent<PlayerShooter>();
             if (playerShooter != null)
-                playerShooter.enabled = false;
+                playerShooter.enabled = false; // 발사 정지
         }
 
-        // SupportShooter 정지
+        // --- SupportShooter 정지 ---
         supportAnimators.Clear();
         supportAnimatorSpeeds.Clear();
         SupportShooter[] shooters = FindObjectsOfType<SupportShooter>();
@@ -96,29 +99,30 @@ public class TimeStop : MonoBehaviour
             shooter.enabled = false;
         }
 
-        // BossSpecial 칼 이동 일시정지 호출
+        // --- BossSpecial 칼 이동 정지 ---
         BossSpecial bossSpecial = FindObjectOfType<BossSpecial>();
         if (bossSpecial != null)
             bossSpecial.PauseBullets();
 
-        // 배경 정지
+        // --- 배경 스크롤 정지 ---
         BackgroundScroll bg = FindObjectOfType<BackgroundScroll>();
         if (bg != null) bg.enabled = false;
 
-        // 흑백 UI 켜기
+        // --- 흑백 UI 활성화 ---
         if (grayscaleOverlayUI != null)
             grayscaleOverlayUI.SetActive(true);
 
-        // 🔹 BossBGM 일시정지
+        // --- 모든 BGM / 효과음 일시정지 ---
         if (AudioManager.Instance != null)
             AudioManager.Instance.PauseAllAudio();
     }
 
+    // 시간정지 종료
     public void EndTimeStop()
     {
         IsTimeStopped = false;
 
-        // 플레이어 복구
+        // --- 플레이어 복구 ---
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player != null)
         {
@@ -129,7 +133,7 @@ public class TimeStop : MonoBehaviour
                 playerShooter.enabled = true;
         }
 
-        // SupportShooter 복구
+        // --- SupportShooter 복구 ---
         SupportShooter[] shooters = FindObjectsOfType<SupportShooter>();
         for (int i = 0; i < shooters.Length; i++)
         {
@@ -139,20 +143,20 @@ public class TimeStop : MonoBehaviour
                 anim.speed = supportAnimatorSpeeds[i];
         }
 
-        // BossSpecial 칼 이동 재개 호출
+        // --- BossSpecial 칼 이동 재개 ---
         BossSpecial bossSpecial = FindObjectOfType<BossSpecial>();
         if (bossSpecial != null)
             bossSpecial.ResumeBullets();
 
-        // 배경 복구
+        // --- 배경 스크롤 복구 ---
         BackgroundScroll bg = FindObjectOfType<BackgroundScroll>();
         if (bg != null) bg.enabled = true;
 
-        // 흑백 UI 끄기
+        // --- 흑백 UI 비활성화 ---
         if (grayscaleOverlayUI != null)
             grayscaleOverlayUI.SetActive(false);
 
-        // 🔹 BossBGM 이어서 재생
+        // --- BGM / 효과음 재개 ---
         if (AudioManager.Instance != null)
             AudioManager.Instance.ResumeAllAudio();
     }

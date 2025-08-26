@@ -2,23 +2,23 @@ using UnityEngine;
 
 public class SupportShooter : MonoBehaviour
 {
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-    public float bulletSpeed = 10f;
+    public GameObject bulletPrefab;       // 서포트 총알 프리팹
+    public Transform firePoint;           // 총알 발사 위치
+    public float bulletSpeed = 10f;       // 총알 속도
 
-    public Transform player;       // 플레이어 위치 따라다니기용
-    public Vector3 followOffset;   // 플레이어 기준 상대 위치
+    public Transform player;              // 플레이어 위치 따라다니기용
+    public Vector3 followOffset;          // 플레이어 기준 상대 위치
 
-    public float rotationSpeed = 360f;  // 초당 360도 회전
+    public float rotationSpeed = 360f;    // 초당 360도 회전 (1초에 1바퀴)
 
     void Awake()
     {
-        if (player == null)
+        if (player == null)               // 플레이어가 할당되어 있지 않으면
         {
-            PlayerController playerController = FindObjectOfType<PlayerController>();
+            PlayerController playerController = FindObjectOfType<PlayerController>(); // 씬에서 PlayerController 검색
             if (playerController != null)
             {
-                player = playerController.transform;
+                player = playerController.transform; // 플레이어 Transform 할당
             }
         }
 
@@ -26,7 +26,7 @@ public class SupportShooter : MonoBehaviour
         PlayerShooter playerShooter = FindObjectOfType<PlayerShooter>();
         if (playerShooter != null)
         {
-            playerShooter.RegisterSupportShooter(this);
+            playerShooter.RegisterSupportShooter(this); // 총알 발사 시 서포트가 함께 발사되도록 등록
         }
     }
 
@@ -52,11 +52,11 @@ public class SupportShooter : MonoBehaviour
 
     public void Fire()
     {
-        if (bulletPrefab != null && firePoint != null)
+        if (bulletPrefab != null && firePoint != null)   // 총알과 발사 위치가 존재하면
         {
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity); // 총알 생성
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.velocity = Vector2.up * bulletSpeed;
+            rb.velocity = Vector2.up * bulletSpeed;       // 위 방향으로 발사
         }
     }
 }

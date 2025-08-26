@@ -4,60 +4,63 @@ using UnityEngine.SceneManagement;
 public class GameOverUIManager : MonoBehaviour
 {
     [Header("References")]
-    public GameObject gameOverPanel;      // GameOverPanel
-    public RectTransform selector;        // 화살표 이미지
+    public GameObject gameOverPanel;      // 게임오버 UI 패널
+    public RectTransform selector;        // 메뉴 선택 화살표 이미지
 
     [Header("Selector Fixed Positions")]
-    public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu 왼쪽
-    public Vector2 retryPos = new Vector2(300f, -316f);    // Retry 왼쪽
-    public bool IsShown => isShown;  // 외부에서 읽기만 가능
+    public Vector2 mainMenuPos = new Vector2(300f, -250f); // Main Menu 화살표 위치
+    public Vector2 retryPos = new Vector2(300f, -316f);    // Retry 화살표 위치
+    public bool IsShown => isShown;  // 외부에서 UI 표시 여부를 읽기 전용으로 확인
 
-    private int currentIndex = 0; // 0 = MainMenu, 1 = Retry
-    private bool isShown = false;
+    private int currentIndex = 0; // 현재 선택 인덱스 (0 = MainMenu, 1 = Retry)
+    private bool isShown = false; // 게임오버 UI 표시 여부
 
     private void Start()
     {
+        // 시작 시 UI 숨기기
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
     }
 
     private void Update()
     {
-        if (!isShown) return;
+        if (!isShown) return; // UI가 안 보이면 입력 무시
 
-        // 위/아래 키 입력
+        // 위/아래 키 입력으로 선택 이동
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
-            currentIndex = (currentIndex - 1 + 2) % 2;
-            UpdateSelectorPosition();
+            currentIndex = (currentIndex - 1 + 2) % 2; // 인덱스 순환
+            UpdateSelectorPosition(); // 화살표 위치 갱신
         }
         if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            currentIndex = (currentIndex + 1) % 2;
-            UpdateSelectorPosition();
+            currentIndex = (currentIndex + 1) % 2; // 인덱스 순환
+            UpdateSelectorPosition(); // 화살표 위치 갱신
         }
 
-        // 선택
+        // 선택 확정 (Enter 또는 Z)
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
         {
             ActivateCurrent();
         }
     }
 
+    // 게임오버 UI 표시
     public void ShowGameOverUI()
     {
         isShown = true;
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
-        currentIndex = 0;
-        UpdateSelectorPosition();
+        currentIndex = 0; // 기본 선택 MainMenu
+        UpdateSelectorPosition(); // 화살표 위치 갱신
 
-        // 🔹 여기서 사망 BGM 실행
+        // 플레이어 사망 BGM 재생
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayerDied();
     }
 
+    // 선택 화살표 위치 갱신
     private void UpdateSelectorPosition()
     {
         if (selector == null) return;
@@ -66,38 +69,33 @@ public class GameOverUIManager : MonoBehaviour
         selector.anchoredPosition = pos;
     }
 
+    // 현재 선택한 메뉴 활성화
     private void ActivateCurrent()
     {
         Time.timeScale = 1f; // 씬 이동 전에 시간 복구
 
         switch (currentIndex)
         {
-            case 0: // Main Menu
-                    // 기존 BGM 페이드 아웃
+            case 0: // Main Menu 선택 시
                 if (AudioManager.Instance != null)
-                    AudioManager.Instance.StopBGMWithFade();
+                    AudioManager.Instance.StopBGMWithFade(); // BGM 페이드 아웃
 
-                // MainMenu 씬 로드 전에 GameOver 오브젝트 파괴
-                Destroy(this.gameObject); // GameOverUIManager 포함 오브젝트 삭제
-                SceneManager.LoadScene("Menu");
+                Destroy(this.gameObject); // GameOverUIManager 오브젝트 삭제
+                SceneManager.LoadScene("Menu"); // 메뉴 씬 로드
                 break;
 
-            case 1: // Retry
-                    // 시간 정지 인스턴스 제거
+            case 1: // Retry 선택 시
                 if (TimeStop.Instance != null)
-                    Destroy(TimeStop.Instance.gameObject);
+                    Destroy(TimeStop.Instance.gameObject); // 시간 정지 인스턴스 제거
 
-                // HealthUIManager 자동 초기화 방지
                 if (HealthUIManager.Instance != null)
-                    HealthUIManager.Instance.SetPreventAutoInitialize(true);
+                    HealthUIManager.Instance.SetPreventAutoInitialize(true); // UI 초기화 방지
 
-                // Retry 시 BGM 리셋
                 if (AudioManager.Instance != null)
-                    AudioManager.Instance.RetryReset();
+                    AudioManager.Instance.RetryReset(); // BGM 재설정
 
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name); // 현재 씬 재시작
                 break;
         }
     }
-
 }

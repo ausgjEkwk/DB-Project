@@ -3,32 +3,31 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("이동")]
     public float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 input;
     private Animator animator;
 
+    [Header("서포트 옵션")]
     public GameObject supportPrefab;
     public Transform supportPosLeft;
     public Transform supportPosRight;
-
     private List<GameObject> activeSupports = new List<GameObject>();
     private List<Transform> supportPositions = new List<Transform>();
-
     private int itemCount = 0;
 
-    // 이동 제한용
-    public Transform areaLimit; // Area 오브젝트 (BoxCollider2D 포함)
+    [Header("이동 제한")]
+    public Transform areaLimit; // BoxCollider2D 포함
     private Vector2 minBounds;
     private Vector2 maxBounds;
-
-    private bool areaLimitDisabled = false; // PlayArea 제한 비활성화 여부
+    private bool areaLimitDisabled = false; // PlayArea 제한 해제 여부
 
     private Health health; // Health 컴포넌트 참조
 
-    // ▼ 아이템 흡수 기능 관련 변수
-    public float itemAttractRadius = 3f;     // 끌어당기기 시작할 거리
-    public float itemAbsorbSpeed = 5f;       // 끌어당기는 속도
+    [Header("아이템 흡수")]
+    public float itemAttractRadius = 3f;  // 끌어당기기 시작 거리
+    public float itemAbsorbSpeed = 5f;    // 이동 속도
 
     private void Awake()
     {
@@ -36,9 +35,11 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         health = GetComponent<Health>();
 
+        // 서포트 위치 초기화
         if (supportPosLeft != null) supportPositions.Add(supportPosLeft);
         if (supportPosRight != null) supportPositions.Add(supportPosRight);
 
+        // 이동 제한 영역 계산
         if (areaLimit != null)
         {
             BoxCollider2D box = areaLimit.GetComponent<BoxCollider2D>();
@@ -48,12 +49,10 @@ public class PlayerController : MonoBehaviour
                 minBounds = bounds.min;
                 maxBounds = bounds.max;
             }
-            else
-            {
-                Debug.LogWarning("Area 오브젝트에 BoxCollider2D가 없습니다.");
-            }
+            else Debug.LogWarning("Area 오브젝트에 BoxCollider2D가 없습니다.");
         }
 
+        // 체력 UI 초기화
         if (health != null)
         {
             HealthUIManager.Instance?.InitializeHearts(health.maxHealth);
@@ -62,12 +61,14 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // 이동 입력
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
 
         animator.SetBool("isMoving", input.magnitude > 0.01f);
 
-        AttractNearbyItems(); // 아이템 흡수 실행
+        // 주변 아이템 흡수
+        AttractNearbyItems();
     }
 
     private void FixedUpdate()
@@ -77,33 +78,26 @@ public class PlayerController : MonoBehaviour
 
         if (!areaLimitDisabled)
         {
-            // PlayArea 제한이 켜져있으면 clamp 적용
+            // 이동 제한 영역 적용
             float clampedX = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
             float clampedY = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
             rb.MovePosition(new Vector2(clampedX, clampedY));
         }
         else
         {
-            // 제한 해제 시 그대로 이동 (화면 밖 가능)
-            rb.MovePosition(newPosition);
+            rb.MovePosition(newPosition); // 제한 해제 시 자유 이동
         }
     }
 
-
+    // 아이템 획득 처리
     public void AddItem()
     {
         FindObjectOfType<ScoreManager>()?.AddScore(100);
-
         itemCount++;
 
-        if (itemCount == 3 && activeSupports.Count == 0)
-        {
-            SpawnSupport();
-        }
-        else if (itemCount == 6 && activeSupports.Count == 1)
-        {
-            SpawnSupport();
-        }
+        // 아이템 획득에 따라 서포트 소환
+        if (itemCount == 3 && activeSupports.Count == 0) SpawnSupport();
+        else if (itemCount == 6 && activeSupports.Count == 1) SpawnSupport();
     }
 
     private void SpawnSupport()
@@ -126,15 +120,14 @@ public class PlayerController : MonoBehaviour
         activeSupports.Add(support);
     }
 
-    
-    // ▼ 아이템 흡수 기능
+    // 주변 아이템 흡수 기능
     private void AttractNearbyItems()
     {
         Collider2D[] items = Physics2D.OverlapCircleAll(transform.position, itemAttractRadius);
 
         foreach (Collider2D itemCol in items)
         {
-            if (itemCol.CompareTag("Item")) // Item 프리팹의 태그가 "Item"이어야 함
+            if (itemCol.CompareTag("Item"))
             {
                 Transform itemTransform = itemCol.transform;
                 itemTransform.position = Vector2.MoveTowards(
@@ -143,8 +136,7 @@ public class PlayerController : MonoBehaviour
                     itemAbsorbSpeed * Time.deltaTime
                 );
 
-                float distance = Vector2.Distance(transform.position, itemTransform.position);
-                if (distance < 0.2f)
+                if (Vector2.Distance(transform.position, itemTransform.position) < 0.2f)
                 {
                     AddItem();
                     Destroy(itemCol.gameObject);
@@ -153,6 +145,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // 이동 제한 해제
     public void DisableAreaLimit(bool disable)
     {
         areaLimitDisabled = disable;
@@ -168,8 +161,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    // (선택) 아이템 흡수 반경 시각화 Gizmo
+    // 아이템 흡수 범위 시각화
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
