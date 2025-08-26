@@ -40,7 +40,6 @@ public class TimeStop : MonoBehaviour
         }
     }
 
-
     private IEnumerator AssignGrayscaleOverlay()
     {
         // 씬이 완전히 초기화될 때까지 2프레임 대기
@@ -109,6 +108,10 @@ public class TimeStop : MonoBehaviour
         // 흑백 UI 켜기
         if (grayscaleOverlayUI != null)
             grayscaleOverlayUI.SetActive(true);
+
+        // 🔹 BossBGM 일시정지
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PauseAllAudio();
     }
 
     public void EndTimeStop()
@@ -148,5 +151,9 @@ public class TimeStop : MonoBehaviour
         // 흑백 UI 끄기
         if (grayscaleOverlayUI != null)
             grayscaleOverlayUI.SetActive(false);
+
+        // 🔹 BossBGM 이어서 재생
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ResumeAllAudio();
     }
 }

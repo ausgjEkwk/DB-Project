@@ -34,6 +34,8 @@ public class AudioManager : MonoBehaviour
     private bool isBossActive = false;
     private bool isPlayerDead = false;
 
+    private bool isPaused = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -87,7 +89,7 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Menu씬에서는 아무것도 하지 않음 → MenuBGMManager 전담
+        // Menu씬에서는 MenuBGMManager 전담
         if (scene.name == "Menu") return;
 
         // Main씬 진입 시
@@ -192,6 +194,7 @@ public class AudioManager : MonoBehaviour
         StopBGMWithFadeImmediate();
         isPlayerDead = false;
         isBossActive = false;
+        isPaused = false;
         PlayNormalBGM();
     }
 
@@ -209,9 +212,8 @@ public class AudioManager : MonoBehaviour
     #region SFX Control (StageClearUI 대응)
     public void PlayPlayerAttackSFX(float volume = -1f)
     {
-        // StageClearUI 열려 있으면 재생 금지
-        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown)
-            return;
+        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown) return;
+        if (isPaused) return;
 
         float v = (volume < 0f) ? playerAttackVolume : Mathf.Clamp01(volume);
         if (playerAttackClip != null)
@@ -220,9 +222,8 @@ public class AudioManager : MonoBehaviour
 
     public void PlayPlayerHitSFX(float volume = -1f)
     {
-        // StageClearUI 열려 있으면 재생 금지
-        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown)
-            return;
+        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown) return;
+        if (isPaused) return;
 
         float v = (volume < 0f) ? playerHitVolume : Mathf.Clamp01(volume);
         if (playerHitClip != null)
@@ -232,5 +233,27 @@ public class AudioManager : MonoBehaviour
     public void SetAttackVolume(float volume) => playerAttackVolume = Mathf.Clamp01(volume);
     public void SetHitVolume(float volume) => playerHitVolume = Mathf.Clamp01(volume);
     public void SetBGMVolume(float volume) => activeSource.volume = Mathf.Clamp01(volume);
+    #endregion
+
+    #region Pause/Resume
+    public void PauseAllAudio()
+    {
+        if (isPaused) return;
+        isPaused = true;
+
+        if (activeSource.isPlaying)
+            activeSource.Pause();
+        if (sfxSource.isPlaying)
+            sfxSource.Pause();
+    }
+
+    public void ResumeAllAudio()
+    {
+        if (!isPaused) return;
+        isPaused = false;
+
+        activeSource.UnPause();
+        sfxSource.UnPause();
+    }
     #endregion
 }

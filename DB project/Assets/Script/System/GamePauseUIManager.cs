@@ -58,7 +58,11 @@ public class GamePauseUIManager : MonoBehaviour
         if (pausePanel != null)
             pausePanel.SetActive(true);
 
-        Time.timeScale = 0f; // 게임 일시정지 (패턴2와 충돌 X)
+        Time.timeScale = 0f;
+
+        // AudioManager 정지
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PauseAllAudio();
 
         currentIndex = 0;
         UpdateSelectorPosition();
@@ -70,8 +74,13 @@ public class GamePauseUIManager : MonoBehaviour
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
-        Time.timeScale = 1f; // 게임 재개
+        Time.timeScale = 1f;
+
+        // AudioManager 재개
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ResumeAllAudio();
     }
+
 
     private void UpdateSelectorPosition()
     {
