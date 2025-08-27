@@ -33,46 +33,44 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
-        fireCooldown -= Time.deltaTime;                     // 쿨다운 감소
+        fireCooldown -= Time.deltaTime;
 
         // ───────── 플레이어 공격 ─────────
-        if (Input.GetKey(KeyCode.Z) && fireCooldown <= 0f) // Z키 눌렀고 쿨다운 끝났으면
+        if (Input.GetKey(KeyCode.Z) && fireCooldown <= 0f)
         {
-            Fire();                                        // 총알 발사
-            fireCooldown = fireRate;                       // 쿨다운 초기화
+            Fire();
+            fireCooldown = fireRate;
 
-            foreach (SupportShooter support in supportShooters) // 서포트 발사
-            {
-                if (support != null)
-                {
-                    support.Fire();                        // 서포트 총알 발사
-                }
-            }
+            foreach (SupportShooter support in supportShooters)
+                support?.Fire();
         }
 
         // ───────── 폭탄 사용 ─────────
-        if (Input.GetKeyDown(KeyCode.X))                   // X키 눌렀을 때
+        if (Input.GetKeyDown(KeyCode.X))
         {
-            if (FindObjectOfType<GameOverUIManager>()?.IsShown == true)
-                return;                                   // 게임오버 시 입력 무시
+            // 일시정지 중이거나 게임오버 상태면 폭탄 사용 안함
+            if ((GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown) ||
+                (FindObjectOfType<GameOverUIManager>()?.IsShown == true))
+                return;
 
-            if (boomPrefab != null && boomCount > 0)      // 폭탄 프리팹 있고 개수 > 0이면
+            if (boomPrefab != null && boomCount > 0)
             {
-                Instantiate(boomPrefab, boomSpawnPosition, Quaternion.identity); // 폭탄 생성
-                boomCount--;                              // 폭탄 1 감소
-                boomUIManager?.UpdateBoomUI(boomCount);  // UI 갱신
+                Instantiate(boomPrefab, boomSpawnPosition, Quaternion.identity);
+                boomCount--;
+                boomUIManager?.UpdateBoomUI(boomCount);
             }
         }
 
-        // ───────── 폭탄 자동 충전 ─────────
-        if (boomCount < maxBoomCount)                     // 최대 개수보다 적으면
+
+        // 폭탄 자동 충전
+        if (boomCount < maxBoomCount)
         {
-            boomRechargeTimer += Time.deltaTime;          // 충전 타이머 증가
-            if (boomRechargeTimer >= boomRechargeTime)   // 충전 완료 시
+            boomRechargeTimer += Time.deltaTime;
+            if (boomRechargeTimer >= boomRechargeTime)
             {
-                boomRechargeTimer = 0f;                  // 타이머 초기화
-                boomCount++;                             // 폭탄 1 증가
-                boomUIManager?.UpdateBoomUI(boomCount); // UI 갱신
+                boomRechargeTimer = 0f;
+                boomCount++;
+                boomUIManager?.UpdateBoomUI(boomCount);
             }
         }
     }

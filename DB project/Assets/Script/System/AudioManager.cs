@@ -27,6 +27,39 @@ public class AudioManager : MonoBehaviour
     public float fadeDuration = 1f;         // BGM 페이드 시간
     public float delayBetweenFades = 1f;    // BGM 전환 시 딜레이
 
+    // OptionPanel과 연결 가능하게 public 프로퍼티 추가
+    public float ActiveBGMVolume => activeSource != null ? activeSource.volume : 1f;
+    public float NormalBGMVolume
+    {
+        get => normalVolume;
+        set
+        {
+            normalVolume = Mathf.Clamp01(value);
+            if (!isBossActive && activeSource != null)
+                activeSource.volume = normalVolume;
+        }
+    }
+    public float BossBGMVolume
+    {
+        get => bossVolume;
+        set
+        {
+            bossVolume = Mathf.Clamp01(value);
+            if (isBossActive && activeSource != null)
+                activeSource.volume = bossVolume;
+        }
+    }
+    public float AttackSFXVolume
+    {
+        get => playerAttackVolume;
+        set => playerAttackVolume = Mathf.Clamp01(value);
+    }
+    public float HitSFXVolume
+    {
+        get => playerHitVolume;
+        set => playerHitVolume = Mathf.Clamp01(value);
+    }
+
     private AudioSource activeSource;       // BGM 재생용 AudioSource
     private AudioSource sfxSource;          // SFX 재생용 AudioSource
     private Coroutine fadeCoroutine;        // BGM 페이드 코루틴 참조
