@@ -20,6 +20,10 @@ public class Item : MonoBehaviour
 
     void Update()
     {
+        // 시간정지 중이면 이동 안함
+        if (TimeStop.IsStopped)
+            return;
+
         if (playerTransform == null) return; // 플레이어 없으면 이동 안함
 
         // 플레이어와 아이템 간 거리 계산

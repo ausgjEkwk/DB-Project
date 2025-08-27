@@ -244,22 +244,24 @@ public class AudioManager : MonoBehaviour
     #region SFX Control (StageClearUI 대응)
     public void PlayPlayerAttackSFX(float volume = -1f)
     {
-        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown) return; // 스테이지 클리어 UI 활성 시 재생 방지
+        if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown) return;
         if (isPaused) return;
+        if (isPlayerDead) return;  // 🔹 플레이어 사망 시 공격 SFX 차단
 
         float v = (volume < 0f) ? playerAttackVolume : Mathf.Clamp01(volume);
         if (playerAttackClip != null)
-            sfxSource.PlayOneShot(playerAttackClip, v); // 공격 SFX 재생
+            sfxSource.PlayOneShot(playerAttackClip, v);
     }
 
     public void PlayPlayerHitSFX(float volume = -1f)
     {
         if (StageClearUIManager.Instance != null && StageClearUIManager.Instance.IsShown) return;
         if (isPaused) return;
+        if (isPlayerDead) return;  // 🔹 플레이어 사망 시 피격 SFX 차단
 
         float v = (volume < 0f) ? playerHitVolume : Mathf.Clamp01(volume);
         if (playerHitClip != null)
-            sfxSource.PlayOneShot(playerHitClip, v); // 피격 SFX 재생
+            sfxSource.PlayOneShot(playerHitClip, v);
     }
 
     public void SetAttackVolume(float volume) => playerAttackVolume = Mathf.Clamp01(volume); // 공격 볼륨 설정

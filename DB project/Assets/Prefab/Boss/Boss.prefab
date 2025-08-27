@@ -224,10 +224,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bossBulletPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
   bulletDistance: 1
-  rotateSpeed: 360
-  totalRotations: 5
+  rotateSpeed: 280
+  totalRotations: 6
   fireRate: 0.05
-  launchInterval: 0.01
+  launchInterval: 0.001
   bulletSpeed: 10
 --- !u!114 &8853531874228033820
 MonoBehaviour:
@@ -243,7 +243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   swordPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
   radius: 1.5
-  swordCount: 8
+  swordCount: 12
   swordSpeed: 15
   spawnDistanceInterval: 1
 --- !u!114 &-8530305315108535449
