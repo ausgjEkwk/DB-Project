@@ -86,7 +86,7 @@ public class EnemySpawner : MonoBehaviour
             AudioManager.Instance.StopBGMWithFade();
         }
 
-        yield return new WaitForSeconds(5f); // 5초 후 보스 소환
+        yield return new WaitForSeconds(3.5f); // 5초 후 보스 소환
 
         if (!bossSpawned)
         {

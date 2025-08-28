@@ -189,7 +189,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_Name
-      value: MonsterB2
+      value: MonsterB (1)
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_TagString
@@ -279,7 +279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_Name
-      value: MonsterB3
+      value: MonsterB (2)
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_TagString

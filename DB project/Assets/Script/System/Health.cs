@@ -5,95 +5,77 @@ public class Health : MonoBehaviour
 {
     public int maxHealth = 5;       // 최대 체력
     public int currentHealth;       // 현재 체력
-    public bool isPlayer;           // 플레이어인지 여부
+    public bool isPlayer;           // 플레이어 여부
 
     // 체력 0이 되어 죽었을 때 호출되는 이벤트 (외부 구독 가능)
     public event Action OnDeath;
 
     private void Start()
     {
-        currentHealth = maxHealth; // 시작 시 체력 초기화
-
-        if (isPlayer)
-        {
-            // 플레이어라면 UI 초기화 및 체력 표시
-            HealthUIManager.Instance?.InitializeHearts(maxHealth);
-            HealthUIManager.Instance?.UpdateHearts(currentHealth);
-        }
+        currentHealth = maxHealth;
     }
 
-    // 피해 처리
     public void TakeDamage(int amount)
     {
-        if (amount <= 0) return; // 음수 피해 무시
+        if (amount <= 0) return;
 
         currentHealth -= amount;
-        if (currentHealth < 0) currentHealth = 0; // 음수 체력 방지
-
-        if (isPlayer)
+        if (currentHealth <= 0)
         {
-            // UI 업데이트
-            HealthUIManager.Instance?.UpdateHearts(currentHealth);
+            currentHealth = 0;
 
-            // 체력 0 이하 시 플레이어 사망 처리
-            if (currentHealth <= 0)
+            // 플레이어 처리
+            if (isPlayer)
             {
                 Debug.Log("플레이어 사망");
-
-                // 1) 스프라이트 회색 처리 (죽은 효과)
-                SpriteRenderer[] srs = GetComponentsInChildren<SpriteRenderer>();
-                foreach (var sr in srs)
-                    sr.color = Color.gray;
-
-                // 2) 게임 시간 정지
-                Time.timeScale = 0f;
-
-                // 3) Game Over UI 표시
-                FindObjectOfType<GameOverUIManager>()?.ShowGameOverUI();
-
-                // 4) 사망 BGM 재생
-                if (AudioManager.Instance != null)
-                    AudioManager.Instance.PlayerDied();
-
-                // 5) 외부 이벤트 호출
-                OnDeath?.Invoke();
-            }
-        }
-        else
-        {
-            // 적 또는 NPC 체력 0 이하 시
-            if (currentHealth <= 0)
-            {
                 OnDeath?.Invoke(); // 이벤트 호출
-                Destroy(gameObject); // 오브젝트 제거
+                // TODO: 게임오버 처리
+            }
+            else
+            {
+                // 몬스터 처리
+                OnDeath?.Invoke(); // 이벤트 호출
+
+                if (IsCenterMonster())
+                {
+                    // 가운데 몬스터면 부모 그룹 전체 삭제
+                    if (transform.parent != null)
+                        Destroy(transform.parent.gameObject);
+                    else
+                        Destroy(gameObject);
+                }
+                else
+                {
+                    // 양 옆 몬스터면 자기 자신만 삭제
+                    Destroy(gameObject);
+                }
             }
         }
     }
 
-    // 체력 회복 처리
     public void Heal(int amount)
     {
-        if (!isPlayer) return;    // 플레이어만 회복 가능
-        if (amount <= 0) return;  // 음수 회복 무시
+        if (!isPlayer) return;
+        if (amount <= 0) return;
 
-        int oldMaxHealth = maxHealth;
-
-        // 최대 체력 증가 (최대 10)
-        maxHealth += amount;
-        if (maxHealth > 10) maxHealth = 10;
-
-        // 최대 체력이 바뀌면 UI 하트 재설정
-        if (maxHealth != oldMaxHealth)
-        {
-            HealthUIManager.Instance?.InitializeHearts(maxHealth);
-        }
-
-        // 현재 체력 증가
         currentHealth += amount;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
+    }
 
-        // UI 업데이트
-        HealthUIManager.Instance?.UpdateHearts(currentHealth);
+    // 가운데 몬스터 판단: 이름 끝에 "(숫자)"가 없는 경우 true
+    private bool IsCenterMonster()
+    {
+        string objName = gameObject.name;
+
+        // "(숫자)"로 끝나면 가운데 몬스터 아님
+        if (objName.EndsWith(")"))
+            return false;
+
+        // MonsterA, MonsterB, MonsterC 라면 가운데 몬스터
+        if (objName.StartsWith("MonsterA") || objName.StartsWith("MonsterB") || objName.StartsWith("MonsterC"))
+            return true;
+
+        return false;
     }
 }
