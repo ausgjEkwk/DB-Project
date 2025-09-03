@@ -20,10 +20,11 @@ public class BossSceneStartEvent : MonoBehaviour
     [Header("딜레이 설정")]
     public float playerDelay = 1f;
     public float bossDelay = 1f;
-    public float bossAfterBgDelay = 1f; // PBoss 등장 후 배경 전환 딜레이
+    public float bossAfterBgDelay = 0.5f;
 
     private PlayerController playerController;
     private GameObject currentPBoss;
+    private bool isPlayingSequence = false;
 
     void Start()
     {
@@ -33,10 +34,10 @@ public class BossSceneStartEvent : MonoBehaviour
             return;
         }
 
-        // PlayerController 참조
+        // PlayerController 참조 및 이동 제한 해제
         playerController = player.GetComponent<PlayerController>();
         if (playerController != null)
-            playerController.DisableAreaLimit(true); // 연출 중 이동 제한 해제
+            playerController.DisableAreaLimit(true);
 
         // Player 시작 위치
         player.position = startPoint.position;
@@ -47,51 +48,63 @@ public class BossSceneStartEvent : MonoBehaviour
 
     private IEnumerator SceneStartSequence()
     {
-        // 1. Dumy_B 생성 후 End까지 이동
+        isPlayingSequence = true;
+
+        // 1. DummyB 이동
         if (dummyBPrefab != null)
         {
             GameObject dummy = Instantiate(dummyBPrefab, startPoint.position, Quaternion.identity);
-            yield return StartCoroutine(MoveToPosition(dummy.transform, endPoint.position, dummySpeed));
+            yield return MoveToPosition(dummy.transform, endPoint.position, dummySpeed);
             Destroy(dummy);
         }
 
-        // 2. Dumy_B 삭제 후 1초 대기
-        yield return new WaitForSeconds(playerDelay);
+        yield return new WaitForSecondsRealtime(playerDelay);
 
-        // 3. Player 상승
-        Vector3 playerTarget = player.position + new Vector3(0f, 2f, 0f);
-        yield return StartCoroutine(MoveToPosition(player, playerTarget, playerMoveSpeed));
+        // 2. Player 상승
+        Vector3 playerTarget = player.position + Vector3.up * 2f;
+        yield return MoveToPosition(player, playerTarget, playerMoveSpeed);
 
-        // 4. Player 상승 완료 후 1초 대기
-        yield return new WaitForSeconds(bossDelay);
+        yield return new WaitForSecondsRealtime(bossDelay);
 
-        // 5. PBoss 등장
+        // 3. PBoss 등장
         if (pBossPrefab != null)
         {
-            Vector3 bossStartPos = endPoint.position;
-            Vector3 bossTarget = bossStartPos + new Vector3(0f, -4f, 0f);
-            currentPBoss = Instantiate(pBossPrefab, bossStartPos, Quaternion.identity);
-            yield return StartCoroutine(MoveToPosition(currentPBoss.transform, bossTarget, bossMoveSpeed));
+            Vector3 bossStart = endPoint.position;
+            Vector3 bossTarget = bossStart + Vector3.down * 4f;
+            currentPBoss = Instantiate(pBossPrefab, bossStart, Quaternion.identity);
+            yield return MoveToPosition(currentPBoss.transform, bossTarget, bossMoveSpeed);
         }
 
-        // 6. PBoss 등장 후 1초 대기 → 배경 전환
-        yield return new WaitForSeconds(bossAfterBgDelay);
+        // 4. 배경 전환 (한 프레임 대기 포함)
         BackgroundChanger bgChanger = FindObjectOfType<BackgroundChanger>();
         if (bgChanger != null)
+        {
             bgChanger.ChangeToBossBackground();
+            yield return null; // 한 프레임 대기 → GPU 부담 최소화
+        }
 
-        // 7. 연출 끝나면 Player 이동 제한 다시 활성화
+        yield return new WaitForSecondsRealtime(bossAfterBgDelay);
+
+        // 5. PBoss BGM 페이드 인 (BAudioManager 코루틴 내부에서 처리)
+        BAudioManager.Instance?.PlayBossBGM();
+
+        // 6. 연출 끝나면 Player 이동 제한 해제
         if (playerController != null)
             playerController.DisableAreaLimit(false);
+
+        isPlayingSequence = false;
     }
 
     private IEnumerator MoveToPosition(Transform obj, Vector3 target, float speed)
     {
         while (Vector3.Distance(obj.position, target) > 0.01f)
         {
-            obj.position = Vector3.MoveTowards(obj.position, target, speed * Time.deltaTime);
+            obj.position = Vector3.MoveTowards(obj.position, target, speed * Time.unscaledDeltaTime);
             yield return null;
         }
         obj.position = target;
     }
+
+    // PlayerController에서 호출 가능: 입력 차단 여부 확인
+    public bool IsPlayingSequence() => isPlayingSequence;
 }

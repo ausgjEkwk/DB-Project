@@ -22,6 +22,9 @@ public class PlayerShooter : MonoBehaviour
 
     private BoomUIManager boomUIManager;         // 폭탄 UI 연동
 
+    private AudioManager audioManager;
+    private BAudioManager bAudioManager;
+
     void Start()
     {
         boomUIManager = FindObjectOfType<BoomUIManager>();  // 씬에서 BoomUIManager 검색
@@ -29,6 +32,10 @@ public class PlayerShooter : MonoBehaviour
         {
             boomUIManager.UpdateBoomUI(boomCount);         // UI 초기화
         }
+
+        // AudioManager/BossAudioManager 참조
+        audioManager = AudioManager.Instance;
+        bAudioManager = BAudioManager.Instance;
     }
 
     void Update()
@@ -48,7 +55,6 @@ public class PlayerShooter : MonoBehaviour
         // ───────── 폭탄 사용 ─────────
         if (Input.GetKeyDown(KeyCode.X))
         {
-            // 일시정지 중이거나 게임오버 상태면 폭탄 사용 안함
             if ((GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown) ||
                 (FindObjectOfType<GameOverUIManager>()?.IsShown == true))
                 return;
@@ -60,7 +66,6 @@ public class PlayerShooter : MonoBehaviour
                 boomUIManager?.UpdateBoomUI(boomCount);
             }
         }
-
 
         // 폭탄 자동 충전
         if (boomCount < maxBoomCount)
@@ -84,16 +89,18 @@ public class PlayerShooter : MonoBehaviour
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             rb.velocity = Vector2.up * bulletSpeed;      // 위 방향으로 이동
 
-            AudioManager.Instance?.PlayPlayerAttackSFX(); // 공격 사운드 재생
+            // 공격 사운드 재생 (Main: AudioManager, Boss: BAudioManager)
+            if (audioManager != null)
+                audioManager.PlayPlayerAttackSFX();
+            else if (bAudioManager != null)
+                bAudioManager.PlayerAttack();
         }
     }
 
     // ───────── 서포트 등록 ─────────
     public void RegisterSupportShooter(SupportShooter support)
     {
-        if (!supportShooters.Contains(support))          // 중복 등록 방지
-        {
-            supportShooters.Add(support);                // 리스트에 추가
-        }
+        if (!supportShooters.Contains(support))
+            supportShooters.Add(support);
     }
 }
