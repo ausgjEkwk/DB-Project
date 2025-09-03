@@ -2417,6 +2417,8 @@ MonoBehaviour:
   maxHealth: 5
   currentHealth: 5
   isPlayer: 1
+  isCenterMonster: 0
+  invincibleDuration: 1
 --- !u!1 &796486209
 GameObject:
   m_ObjectHideFlags: 0
