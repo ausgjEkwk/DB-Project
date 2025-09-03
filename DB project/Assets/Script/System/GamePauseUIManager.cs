@@ -39,6 +39,10 @@ public class GamePauseUIManager : MonoBehaviour
 
     private void Update()
     {
+        // GameOverUI가 켜져있으면 일시정지 입력 무시
+        if (GameOverUIManager.Instance != null && GameOverUIManager.Instance.IsShown)
+            return;
+
         // ESC 키 입력 시 일시정지 토글
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -74,6 +78,7 @@ public class GamePauseUIManager : MonoBehaviour
             ActivateCurrent();
         }
     }
+
 
     // 일시정지 UI 표시
     public void ShowPauseUI()

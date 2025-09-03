@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossPattern1 : MonoBehaviour
 {
     public GameObject bossBulletPrefab; // 발사할 보스 총알 프리팹
-    public float bulletDistance = 2f; // 총알이 이동할 목표 거리
+    public float bulletDistance = 1.5f; // 총알이 이동할 목표 거리
     public float rotateSpeed = 360f; // 보스 회전 속도
     public float totalRotations = 3f; // 총 회전 횟수
     public float fireRate = 0.05f; // 총알 발사 간격
@@ -110,7 +110,7 @@ public class BossPattern1 : MonoBehaviour
             yield return null; // 한 프레임 대기
         }
 
-        yield return new WaitForSeconds(0.5f); // 잠시 대기
+        yield return new WaitForSeconds(1f); // 잠시 대기
 
         for (int i = 0; i < spawnedBullets.Count; i++) // 최종 발사
         {

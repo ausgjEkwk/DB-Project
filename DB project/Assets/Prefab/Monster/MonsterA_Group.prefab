@@ -84,7 +84,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 7756a056a62db564490dfb22ca5d325d, type: 3}
       propertyPath: m_Name
-      value: MonsterA (1)
+      value: MonsterA1
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 7756a056a62db564490dfb22ca5d325d, type: 3}
       propertyPath: m_TagString
@@ -125,6 +125,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 0
 --- !u!1001 &6632001399901468950
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -222,6 +223,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 1
 --- !u!1001 &7437784858278697363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -272,7 +274,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 7756a056a62db564490dfb22ca5d325d, type: 3}
       propertyPath: m_Name
-      value: MonsterA (2)
+      value: MonsterA2
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 7756a056a62db564490dfb22ca5d325d, type: 3}
       propertyPath: m_TagString
@@ -307,6 +309,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 0
 --- !u!4 &8502272403260570203 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1352894493682623432, guid: 7756a056a62db564490dfb22ca5d325d, type: 3}

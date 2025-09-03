@@ -2398,7 +2398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5061060685225530336, guid: 2477b0c9f6c07a34eb3cee7ac4cd8ace, type: 3}
   firePoint: {fileID: 412846907}
-  bulletSpeed: 11
+  bulletSpeed: 10
   fireRate: 0.25
   boomPrefab: {fileID: 6547510962002533745, guid: 23bb293f32cb51e4ea5e333b555b31c2, type: 3}
   boomSpawnPosition: {x: 0, y: 0, z: 0}

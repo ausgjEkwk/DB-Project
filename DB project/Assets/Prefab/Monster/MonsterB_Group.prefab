@@ -44,7 +44,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -3675287157520745797, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: bulletSpeed
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1352894493682623432, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_LocalPosition.x
@@ -131,6 +131,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 1
 --- !u!1001 &6131221327179439093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -189,7 +190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_Name
-      value: MonsterB (1)
+      value: MonsterB1
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_TagString
@@ -229,6 +230,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 0
 --- !u!1001 &7485639811913506581
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -279,7 +281,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_Name
-      value: MonsterB (2)
+      value: MonsterB2
       objectReference: {fileID: 0}
     - target: {fileID: 3220414191749208333, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}
       propertyPath: m_TagString
@@ -314,6 +316,7 @@ MonoBehaviour:
   maxHealth: 3
   currentHealth: 0
   isPlayer: 0
+  isCenterMonster: 0
 --- !u!4 &8440915446020488413 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1352894493682623432, guid: 0de7852a96dc22a4dbdcf52d9cea7b95, type: 3}

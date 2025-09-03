@@ -100,7 +100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5061060685225530336, guid: 2477b0c9f6c07a34eb3cee7ac4cd8ace, type: 3}
   firePoint: {fileID: 7014761324409088289}
-  bulletSpeed: 11
+  bulletSpeed: 10
   player: {fileID: 0}
   followOffset: {x: 0, y: 0, z: 0}
   rotationSpeed: 360

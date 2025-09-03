@@ -223,11 +223,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossBulletPrefab: {fileID: 455275070939650603, guid: a49fbcad1641bb7449ce1402256c3b62, type: 3}
-  bulletDistance: 1.25
+  bulletDistance: 1
   rotateSpeed: 300
-  totalRotations: 5
+  totalRotations: 4
   fireRate: 0.05
-  launchInterval: 0.005
+  launchInterval: 0.001
   bulletSpeed: 10
 --- !u!114 &8853531874228033820
 MonoBehaviour:
@@ -260,7 +260,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gatePrefab: {fileID: 7906833301889499331, guid: 2e3752845e6ece649baabf600e61b0f1, type: 3}
   verticalSpacing: 2
-  horizontalDistance: 2
+  horizontalDistance: 2.5
   spawnCount: 9
   bulletSpeed: 6
 --- !u!114 &6117540330267148371

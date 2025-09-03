@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class GameOverUIManager : MonoBehaviour
 {
+    public static GameOverUIManager Instance { get; private set; } // 싱글톤 인스턴스
+
     [Header("References")]
     public GameObject gameOverPanel;      // 게임오버 UI 패널
     public RectTransform selector;        // 메뉴 선택 화살표 이미지
@@ -14,6 +16,12 @@ public class GameOverUIManager : MonoBehaviour
 
     private int currentIndex = 0; // 현재 선택 인덱스 (0 = MainMenu, 1 = Retry)
     private bool isShown = false; // 게임오버 UI 표시 여부
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject); // 중복 방지
+    }
 
     private void Start()
     {
