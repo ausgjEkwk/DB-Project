@@ -14,6 +14,7 @@ TagManager:
   - Ybullet
   - HealthItem
   - Item
+  - PBullet
   layers:
   - Default
   - TransparentFX

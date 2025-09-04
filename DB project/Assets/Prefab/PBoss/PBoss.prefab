@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 461601226140779074}
   - component: {fileID: 1580677372785137666}
   - component: {fileID: 5808612606999827368}
+  - component: {fileID: -3495300341052541928}
+  - component: {fileID: 5463135386414860974}
   m_Layer: 0
   m_Name: PBoss
   m_TagString: Untagged
@@ -119,3 +121,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c77cd03efdcef0848be6ee8285cd64f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3495300341052541928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376287345992183125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98d402852c2dc3438d039b01e91f830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movePoints:
+  - {x: 0, y: 3}
+  - {x: -1, y: 4}
+  - {x: -1.5, y: 2}
+  - {x: 1, y: 4}
+  - {x: 1.5, y: 2}
+  moveSpeed: 3
+  bulletPrefab: {fileID: 8970015193858713643, guid: 51c764024a6cb15498dd2bd7adaefb5f, type: 3}
+  bulletSpeed: 4
+  bulletsPerCircle: 36
+  circleCount: 3
+  circleDelay: 0.1
+  slowBulletPrefab: {fileID: 8387149781258315344, guid: 052a96a4dc566f04283fa8d8e91e0961, type: 3}
+  slowBulletSpeed: 3
+  slowBulletsPerCircle: 36
+  slowCircleCount: 3
+  slowCircleDelay: 0.1
+--- !u!114 &5463135386414860974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376287345992183125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34912f536923b8d43b499ed7cd0b2514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magicCirclePrefab: {fileID: 7957737990578637383, guid: ccbb51803dd05a547874f314cb864c42, type: 3}
+  bulletPrefab: {fileID: 5482335252814709092, guid: 607473568ec69234594b95d068cccd4a, type: 3}
+  bulletSpeed: 4
+  fireDistanceInterval: 1
+  loopPositions:
+  - {x: -3.3, y: 6}
+  - {x: -3.3, y: -6}
+  - {x: 3.3, y: -6}
+  - {x: 3.3, y: 6}
+  moveDuration: 2

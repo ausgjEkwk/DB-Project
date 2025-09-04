@@ -56,7 +56,7 @@ public class BossSceneStartEvent : MonoBehaviour
             currentDummyB = Instantiate(dummyBPrefab, startPoint.position, Quaternion.identity);
         }
 
-        // DummyB 생성 후 1초 뒤에 컷씬 시작
+        // DummyB 생성 후 1초 뒤 컷씬 시작
         StartCoroutine(DelayedStartSequence(1f));
     }
 
@@ -97,23 +97,19 @@ public class BossSceneStartEvent : MonoBehaviour
             yield return MoveToPosition(currentPBoss.transform, bossTarget, bossMoveSpeed);
         }
 
-        // PBoss 멈춘 후 0.5초 대기
+        // PBoss 도착 후 0.5초 대기
         yield return new WaitForSecondsRealtime(0.5f);
 
-        // 4. 배경 전환
+        // 4. 배경 전환 및 BGM 페이드 인
         BackgroundChanger bgChanger = FindObjectOfType<BackgroundChanger>();
         if (bgChanger != null)
         {
             bgChanger.ChangeToBossBackground();
-            yield return null;
         }
 
-        yield return new WaitForSecondsRealtime(bossAfterBgDelay);
-
-        // 5. PBoss BGM 페이드 인
         BAudioManager.Instance?.PlayBossBGM();
 
-        // 6. 연출 끝 → 이동 제한/입력 잠금 해제
+        // 5. 연출 끝 → 이동 제한/입력 잠금 해제
         if (playerController != null)
         {
             playerController.DisableAreaLimit(false);
