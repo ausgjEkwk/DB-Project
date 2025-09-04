@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
     public float itemAttractRadius = 3f;  // 끌어당기기 시작 거리
     public float itemAbsorbSpeed = 5f;    // 이동 속도
 
+    private bool inputLocked = false; // 입력 차단 여부
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -61,6 +63,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (inputLocked)  // 컷씬 중 입력 무시
+        {
+            input = Vector2.zero;
+            animator.SetBool("isMoving", false);
+            return;
+        }
+
         // 이동 입력
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
@@ -70,6 +79,13 @@ public class PlayerController : MonoBehaviour
         // 주변 아이템 흡수
         AttractNearbyItems();
     }
+
+    // 외부에서 호출 가능
+    public void SetInputLock(bool lockInput)
+    {
+        inputLocked = lockInput;
+    }
+
 
     private void FixedUpdate()
     {

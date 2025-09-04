@@ -128,6 +128,10 @@ public class BossHealth : MonoBehaviour
     // 보스 사망 시 연출
     private IEnumerator DeathSequence()
     {
+        // 시간정지 상태라면 즉시 해제
+        if (TimeStop.Instance != null && TimeStop.Instance.IsTimeStopped)
+            TimeStop.Instance.EndTimeStop();
+
         // BGM 페이드 아웃
         if (AudioManager.Instance != null)
             AudioManager.Instance.StopBGMWithFade();
@@ -179,10 +183,13 @@ public class BossHealth : MonoBehaviour
         }
 
         // 4. StageClearUI 표시
-        if (stageClearUIManager != null)
-        {
-            stageClearUIManager.ShowClearUI();
-        }
+        //if (stageClearUIManager != null)
+        //{
+        //    stageClearUIManager.ShowClearUI();
+        //}
+
+        // StageClearUI 대신 Boss 씬 로드
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Boss");
 
         // 5. 보스 제거
         Die();

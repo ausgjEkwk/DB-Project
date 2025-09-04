@@ -25,6 +25,8 @@ public class PlayerShooter : MonoBehaviour
     private AudioManager audioManager;
     private BAudioManager bAudioManager;
 
+    private bool shootLocked = false; // 공격 차단 여부
+
     void Start()
     {
         boomUIManager = FindObjectOfType<BoomUIManager>();  // 씬에서 BoomUIManager 검색
@@ -40,6 +42,8 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
+        if (shootLocked) return;  // 컷씬 중에는 공격 로직 무시
+
         fireCooldown -= Time.deltaTime;
 
         // ───────── 플레이어 공격 ─────────
@@ -78,6 +82,12 @@ public class PlayerShooter : MonoBehaviour
                 boomUIManager?.UpdateBoomUI(boomCount);
             }
         }
+    }
+
+    // ───────── 외부에서 공격 차단 ─────────
+    public void SetShootLock(bool lockShoot)
+    {
+        shootLocked = lockShoot;
     }
 
     // ───────── 총알 발사 함수 ─────────

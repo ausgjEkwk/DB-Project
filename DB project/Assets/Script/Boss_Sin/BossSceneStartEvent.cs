@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 public class BossSceneStartEvent : MonoBehaviour
 {
-    [Header("ÁöÁ¡")]
+    [Header("ì§€ì ")]
     public Transform startPoint;
     public Transform endPoint;
 
@@ -12,37 +12,57 @@ public class BossSceneStartEvent : MonoBehaviour
     public GameObject pBossPrefab;
     public Transform player;
 
-    [Header("¼Óµµ ¼³Á¤")]
+    [Header("ì†ë„ ì„¤ì •")]
     public float dummySpeed = 10f;
     public float playerMoveSpeed = 5f;
     public float bossMoveSpeed = 6f;
 
-    [Header("µô·¹ÀÌ ¼³Á¤")]
+    [Header("ë”œë ˆì´ ì„¤ì •")]
     public float playerDelay = 1f;
     public float bossDelay = 1f;
     public float bossAfterBgDelay = 0.5f;
 
     private PlayerController playerController;
+    private PlayerShooter playerShooter;
     private GameObject currentPBoss;
+    private GameObject currentDummyB;
     private bool isPlayingSequence = false;
 
     void Start()
     {
         if (player == null)
         {
-            Debug.LogError("Player°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("Playerê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // PlayerController ÂüÁ¶ ¹× ÀÌµ¿ Á¦ÇÑ ÇØÁ¦
         playerController = player.GetComponent<PlayerController>();
-        if (playerController != null)
-            playerController.DisableAreaLimit(true);
+        playerShooter = player.GetComponent<PlayerShooter>();
 
-        // Player ½ÃÀÛ À§Ä¡
+        if (playerController != null)
+        {
+            playerController.DisableAreaLimit(true);
+            playerController.SetInputLock(true);
+        }
+
+        if (playerShooter != null)
+            playerShooter.SetShootLock(true);
+
         player.position = startPoint.position;
 
-        // ¿¬Ãâ ÄÚ·çÆ¾ ½ÃÀÛ
+        // DummyB ìƒì„±
+        if (dummyBPrefab != null)
+        {
+            currentDummyB = Instantiate(dummyBPrefab, startPoint.position, Quaternion.identity);
+        }
+
+        // DummyB ìƒì„± í›„ 1ì´ˆ ë’¤ì— ì»·ì”¬ ì‹œì‘
+        StartCoroutine(DelayedStartSequence(1f));
+    }
+
+    private IEnumerator DelayedStartSequence(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
         StartCoroutine(SceneStartSequence());
     }
 
@@ -50,23 +70,25 @@ public class BossSceneStartEvent : MonoBehaviour
     {
         isPlayingSequence = true;
 
-        // 1. DummyB ÀÌµ¿
-        if (dummyBPrefab != null)
+        if (playerController != null)
+            playerController.SetInputLock(true);
+
+        // 1. DummyB ì´ë™
+        if (currentDummyB != null)
         {
-            GameObject dummy = Instantiate(dummyBPrefab, startPoint.position, Quaternion.identity);
-            yield return MoveToPosition(dummy.transform, endPoint.position, dummySpeed);
-            Destroy(dummy);
+            yield return MoveToPosition(currentDummyB.transform, endPoint.position, dummySpeed);
+            Destroy(currentDummyB);
         }
 
         yield return new WaitForSecondsRealtime(playerDelay);
 
-        // 2. Player »ó½Â
+        // 2. Player ìƒìŠ¹
         Vector3 playerTarget = player.position + Vector3.up * 2f;
         yield return MoveToPosition(player, playerTarget, playerMoveSpeed);
 
         yield return new WaitForSecondsRealtime(bossDelay);
 
-        // 3. PBoss µîÀå
+        // 3. PBoss ë“±ì¥
         if (pBossPrefab != null)
         {
             Vector3 bossStart = endPoint.position;
@@ -75,22 +97,30 @@ public class BossSceneStartEvent : MonoBehaviour
             yield return MoveToPosition(currentPBoss.transform, bossTarget, bossMoveSpeed);
         }
 
-        // 4. ¹è°æ ÀüÈ¯ (ÇÑ ÇÁ·¹ÀÓ ´ë±â Æ÷ÇÔ)
+        // PBoss ë©ˆì¶˜ í›„ 0.5ì´ˆ ëŒ€ê¸°
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        // 4. ë°°ê²½ ì „í™˜
         BackgroundChanger bgChanger = FindObjectOfType<BackgroundChanger>();
         if (bgChanger != null)
         {
             bgChanger.ChangeToBossBackground();
-            yield return null; // ÇÑ ÇÁ·¹ÀÓ ´ë±â ¡æ GPU ºÎ´ã ÃÖ¼ÒÈ­
+            yield return null;
         }
 
         yield return new WaitForSecondsRealtime(bossAfterBgDelay);
 
-        // 5. PBoss BGM ÆäÀÌµå ÀÎ (BAudioManager ÄÚ·çÆ¾ ³»ºÎ¿¡¼­ Ã³¸®)
+        // 5. PBoss BGM í˜ì´ë“œ ì¸
         BAudioManager.Instance?.PlayBossBGM();
 
-        // 6. ¿¬Ãâ ³¡³ª¸é Player ÀÌµ¿ Á¦ÇÑ ÇØÁ¦
+        // 6. ì—°ì¶œ ë â†’ ì´ë™ ì œí•œ/ì…ë ¥ ì ê¸ˆ í•´ì œ
         if (playerController != null)
+        {
             playerController.DisableAreaLimit(false);
+            playerController.SetInputLock(false);
+        }
+        if (playerShooter != null)
+            playerShooter.SetShootLock(false);
 
         isPlayingSequence = false;
     }
@@ -105,6 +135,5 @@ public class BossSceneStartEvent : MonoBehaviour
         obj.position = target;
     }
 
-    // PlayerController¿¡¼­ È£Ãâ °¡´É: ÀÔ·Â Â÷´Ü ¿©ºÎ È®ÀÎ
     public bool IsPlayingSequence() => isPlayingSequence;
 }

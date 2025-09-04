@@ -1,4 +1,5 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class BAudioManager : MonoBehaviour
@@ -12,13 +13,12 @@ public class BAudioManager : MonoBehaviour
     [Header("Player SFX")]
     public AudioClip playerAttackSFX;
     [Range(0f, 1f)] public float attackVolume = 1f;
-
     public AudioClip playerHitSFX;
     [Range(0f, 1f)] public float hitVolume = 1f;
 
     private AudioSource bgmSource;
     private AudioSource sfxSource;
-
+    private AudioListener audioListener;
     private Coroutine fadeCoroutine;
 
     private void Awake()
@@ -27,23 +27,45 @@ public class BAudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.loop = true;
+            bgmSource.volume = bgmVolume;
+
+            sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.loop = false;
+            sfxSource.playOnAwake = false;
+
+            audioListener = GetComponent<AudioListener>();
+            if (audioListener == null)
+                audioListener = gameObject.AddComponent<AudioListener>();
+
+            AudioListener[] listeners = FindObjectsOfType<AudioListener>();
+            foreach (var listener in listeners)
+            {
+                if (listener != audioListener)
+                    listener.enabled = false;
+            }
+
+            if (bossBGM != null)
+                bossBGM.LoadAudioData();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
-
-        bgmSource = gameObject.AddComponent<AudioSource>();
-        bgmSource.loop = true;
-        bgmSource.volume = bgmVolume;
-
-        sfxSource = gameObject.AddComponent<AudioSource>();
-        sfxSource.loop = false;
-        sfxSource.playOnAwake = false;
     }
 
-    #region BGM Control
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        audioListener.enabled = (scene.name == "Boss");
+        if (scene.name != "Boss" && bgmSource.isPlaying)
+            bgmSource.Stop();
+    }
+
     public void PlayBossBGM(float fadeTime = 1f)
     {
         if (bossBGM == null) return;
@@ -58,7 +80,6 @@ public class BAudioManager : MonoBehaviour
 
         if (bgmSource.isPlaying)
         {
-            // ±‚¡∏ BGM ∆‰¿ÃµÂ æ∆øÙ
             while (t < duration)
             {
                 t += Time.unscaledDeltaTime;
@@ -87,9 +108,7 @@ public class BAudioManager : MonoBehaviour
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         bgmSource.Stop();
     }
-    #endregion
 
-    #region SFX Control
     public void PlayerAttack()
     {
         if (playerAttackSFX == null) return;
@@ -101,17 +120,4 @@ public class BAudioManager : MonoBehaviour
         if (playerHitSFX == null) return;
         sfxSource.PlayOneShot(playerHitSFX, hitVolume);
     }
-    #endregion
-
-    #region Volume Control
-    public void SetBGMVolume(float volume)
-    {
-        bgmVolume = Mathf.Clamp01(volume);
-        if (bgmSource.isPlaying)
-            bgmSource.volume = bgmVolume;
-    }
-
-    public void SetAttackVolume(float volume) => attackVolume = Mathf.Clamp01(volume);
-    public void SetHitVolume(float volume) => hitVolume = Mathf.Clamp01(volume);
-    #endregion
 }
