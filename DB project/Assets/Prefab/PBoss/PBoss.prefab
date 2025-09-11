@@ -12,8 +12,10 @@ GameObject:
   - component: {fileID: 461601226140779074}
   - component: {fileID: 1580677372785137666}
   - component: {fileID: 5808612606999827368}
+  - component: {fileID: 1784473817465564317}
   - component: {fileID: -3495300341052541928}
   - component: {fileID: 5463135386414860974}
+  - component: {fileID: 4145989994968830245}
   m_Layer: 0
   m_Name: PBoss
   m_TagString: Untagged
@@ -121,6 +123,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c77cd03efdcef0848be6ee8285cd64f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1784473817465564317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376287345992183125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33a5ff3302006584d9ae978a6cb169a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pattern1Duration: 10
+  pattern2Duration: 10
+  pattern1: {fileID: -3495300341052541928}
+  pattern2: {fileID: 5463135386414860974}
+  pattern3: {fileID: 4145989994968830245}
 --- !u!114 &-3495300341052541928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +168,7 @@ MonoBehaviour:
   slowBulletSpeed: 3
   slowBulletsPerCircle: 36
   slowCircleCount: 3
-  slowCircleDelay: 0.1
+  slowCircleDelay: 0.2
 --- !u!114 &5463135386414860974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,11 +183,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicCirclePrefab: {fileID: 7957737990578637383, guid: ccbb51803dd05a547874f314cb864c42, type: 3}
   bulletPrefab: {fileID: 5482335252814709092, guid: 607473568ec69234594b95d068cccd4a, type: 3}
-  bulletSpeed: 4
-  fireDistanceInterval: 1
-  loopPositions:
+  bulletSpeed: 2
+  fireDistanceInterval: 1.5
+  startPositions:
   - {x: -3.3, y: 6}
   - {x: -3.3, y: -6}
   - {x: 3.3, y: -6}
   - {x: 3.3, y: 6}
   moveDuration: 2
+--- !u!114 &4145989994968830245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376287345992183125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: def2889c065e2b542a446e7808d53709, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 8982609142578104039, guid: c528e7765a4087e4ba2188f8f4f6614f, type: 3}
+  scatterSpeed: 2
+  spawnInterval: 0.05
+  horizontalStartX: 3.5
+  horizontalEndX: -3.5
+  horizontalYLines:
+  - 5
+  - 2
+  - -2
+  - -5
+  horizontalBulletsPerLine: 10
+  verticalStartY: 6
+  verticalEndY: -6
+  verticalXLines:
+  - -2
+  - 0
+  - 2
+  verticalBulletsPerLine: 12

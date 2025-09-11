@@ -17,46 +17,48 @@ public class PBossPattern1 : MonoBehaviour
     public float moveSpeed = 3f;
 
     [Header("기본 탄환 설정")]
-    public GameObject bulletPrefab;       // 기존 탄환 프리팹
+    public GameObject bulletPrefab;
     public float bulletSpeed = 5f;
     public int bulletsPerCircle = 36;
     public int circleCount = 3;
     public float circleDelay = 0.1f;
 
     [Header("느린 원형 탄환 설정")]
-    public GameObject slowBulletPrefab;   // 느린 탄환 프리팹
+    public GameObject slowBulletPrefab;
     public float slowBulletSpeed = 2f;
     public int slowBulletsPerCircle = 36;
     public int slowCircleCount = 3;
     public float slowCircleDelay = 0.3f;
 
     private bool isPatternActive = false;
+    private Coroutine patternCoroutine;
 
     void Start()
     {
-        StartCoroutine(PatternLoopCoroutine());
+        // 코루틴 시작만 하고 실제 실행은 isPatternActive로 제어
+        patternCoroutine = StartCoroutine(PatternLoopCoroutine());
     }
 
     private IEnumerator PatternLoopCoroutine()
     {
-        isPatternActive = true;
-
         int index = 0;
-        while (true) // 무한 반복
+        while (true)
         {
+            if (!isPatternActive)
+            {
+                yield return null;
+                continue;
+            }
+
             Vector2 target = movePoints[index];
+            yield return MoveToPosition(target);
 
-            // 이동
-            yield return StartCoroutine(MoveToPosition(target));
-
-            // 기존 패턴: 세로 탄환 3줄 발사
             for (int i = 0; i < circleCount; i++)
             {
                 ShootCircle();
                 yield return new WaitForSeconds(circleDelay);
             }
 
-            // 느린 원형 탄환 3줄 발사
             for (int i = 0; i < slowCircleCount; i++)
             {
                 ShootSlowCircle();
@@ -79,36 +81,49 @@ public class PBossPattern1 : MonoBehaviour
     private void ShootCircle()
     {
         float angleStep = 360f / bulletsPerCircle;
-
         for (int i = 0; i < bulletsPerCircle; i++)
         {
             float angle = i * angleStep * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-
             float zRotation = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
-
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.Euler(0f, 0f, zRotation));
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            if (rb != null)
-                rb.velocity = dir * bulletSpeed;
+            if (rb != null) rb.velocity = dir * bulletSpeed;
         }
     }
 
     private void ShootSlowCircle()
     {
         float angleStep = 360f / slowBulletsPerCircle;
-
         for (int i = 0; i < slowBulletsPerCircle; i++)
         {
             float angle = i * angleStep * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-
             GameObject bullet = Instantiate(slowBulletPrefab, transform.position, Quaternion.identity);
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            if (rb != null)
-                rb.velocity = dir * slowBulletSpeed;
+            if (rb != null) rb.velocity = dir * slowBulletSpeed;
         }
     }
 
-    public bool IsPatternActive() => isPatternActive;
+    public void SetActivePattern(bool active)
+    {
+        isPatternActive = active;
+
+        if (!active)
+        {
+            // 패턴 중지 시 코루틴 종료
+            if (patternCoroutine != null)
+                StopCoroutine(patternCoroutine);
+            patternCoroutine = null;
+
+            // 중지 시 0번 위치로 자연스럽게 이동
+            StartCoroutine(MoveToPosition(movePoints[0]));
+        }
+        else
+        {
+            // 패턴 시작 시 코루틴 실행
+            if (patternCoroutine == null)
+                patternCoroutine = StartCoroutine(PatternLoopCoroutine());
+        }
+    }
 }

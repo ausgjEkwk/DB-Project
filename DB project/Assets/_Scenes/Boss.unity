@@ -1193,7 +1193,7 @@ MonoBehaviour:
   bossMoveSpeed: 3
   playerDelay: 1.5
   bossDelay: 1.5
-  bossAfterBgDelay: 1
+  bossAfterBgDelay: 0.5
 --- !u!1 &369830976
 GameObject:
   m_ObjectHideFlags: 0

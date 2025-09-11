@@ -111,7 +111,7 @@ public class BossMovement : MonoBehaviour
 
             pattern1Executed = false;
 
-            // 1️⃣ 패턴1 실행
+            // 1️ 패턴1 실행
             if (!pattern1Executed)
             {
                 // 중앙으로 이동
@@ -125,7 +125,7 @@ public class BossMovement : MonoBehaviour
                 yield return new WaitForSeconds(1f);
             }
 
-            // 2️⃣ 왼쪽 이동
+            // 2️ 왼쪽 이동
             while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
                    (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
@@ -135,7 +135,7 @@ public class BossMovement : MonoBehaviour
             yield return StartCoroutine(MoveTo(new Vector3(-2.5f, transform.position.y, 0f), moveSpeed));
             yield return new WaitForSeconds(1f);
 
-            // 3️⃣ 오른쪽 이동 + 잔상 + 패턴2
+            // 3️ 오른쪽 이동 + 잔상 + 패턴2
             while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
                    (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;
@@ -162,7 +162,7 @@ public class BossMovement : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
 
-            // 4️⃣ 가운데 복귀
+            // 4️ 가운데 복귀
             while ((bossSpecialScript != null && bossSpecialScript.IsRunning) ||
                    (GamePauseUIManager.Instance != null && GamePauseUIManager.Instance.IsShown))
                 yield return null;

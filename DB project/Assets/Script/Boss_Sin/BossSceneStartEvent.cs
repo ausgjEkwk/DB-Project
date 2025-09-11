@@ -98,7 +98,7 @@ public class BossSceneStartEvent : MonoBehaviour
         }
 
         // PBoss 도착 후 0.5초 대기
-        yield return new WaitForSecondsRealtime(0.5f);
+        yield return new WaitForSecondsRealtime(bossAfterBgDelay);
 
         // 4. 배경 전환 및 BGM 페이드 인
         BackgroundChanger bgChanger = FindObjectOfType<BackgroundChanger>();
@@ -107,7 +107,15 @@ public class BossSceneStartEvent : MonoBehaviour
             bgChanger.ChangeToBossBackground();
         }
 
+        // BGM 재생
         BAudioManager.Instance?.PlayBossBGM();
+
+        // PBossPatternManager 호출
+        PBossPatternManager patternManager = FindObjectOfType<PBossPatternManager>();
+        if (patternManager != null)
+        {
+            patternManager.StartPatternSequence();
+        }
 
         // 5. 연출 끝 → 이동 제한/입력 잠금 해제
         if (playerController != null)
